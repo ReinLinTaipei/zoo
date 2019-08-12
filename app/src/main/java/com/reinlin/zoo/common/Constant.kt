@@ -1,0 +1,18 @@
+package com.reinlin.zoo.common
+
+const val TAG: String = "Zoo"
+const val BRIEF_INFO_LENGTH: Int = 30
+const val BRIEF_LIST     = "BRIEF_LIST"
+const val DETAIL_EXHIBIT = "DETAIL_EXHIBIT"
+const val DETAIL_PLANT   = "DETAIL_PLANT"
+
+const val BUNDLE_NAME = "BUNDLE_NAME"
+const val BUNDLE_INFO = "BUNDLE_INFO"
+const val BUNDLE_PIC = "BUNDLE_PIC"
+const val BUNDLE_URL = "BUNDLE_URL"
+
+const val BUNDLE_LATIN = "BUNDLE_LATIN"
+const val BUNDLE_ALSO_KNOWN = "BUNDLE_ALSO_KNOWN"
+const val BUNDLE_SUMMARY = "BUNDLE_SUMMARY"
+const val BUNDLE_FEATURE = "BUNDLE_FEATURE"
+const val BUNDLE_FUNCTIONALITY = "BUNDLE_FUNCTIONALITY"

@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Zoo</string>
+    <string name="no_data">Can not find any information</string>
+    <string name="open_web_title">Open on web</string>
+    <string name="plant_also_known">Nick Name</string>
+    <string name="plant_summary">Summary</string>
+    <string name="plant_feature">Feature</string>
+    <string name="plant_function">Functionality</string>
+</resources>
