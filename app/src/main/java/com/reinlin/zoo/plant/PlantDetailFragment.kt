@@ -59,10 +59,10 @@ class PlantDetailFragment: Fragment() {
         dataManager.plant?.let {
             (plant_name as TextView).text = it.name?: ""
             (plant_latin_name as TextView).text = it.nameLatin?: ""
-            (plant_also_known as TextView).text = it.alsoKnown?: ""
-            (plant_summary as TextView).text = it.briefInfo?: ""
-            (plant_feature as TextView).text = it.detail?: ""
-            (plant_functionality as TextView).text = it.function?: ""
+            (plant_also_known_description as TextView).text = it.alsoKnown?: ""
+            (plant_summary_description as TextView).text = it.briefInfo?: ""
+            (plant_feature_description as TextView).text = it.detail?: ""
+            (plant_functionality_description as TextView).text = it.function?: ""
             if (TextUtils.isEmpty(it.picUrl).not()) {
                 Glide.with(context!!)
                     .load(it.picUrl)

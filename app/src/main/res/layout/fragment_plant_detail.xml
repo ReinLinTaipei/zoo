@@ -45,7 +45,7 @@
 
 
         <TextView
-                android:id="@+id/plant_also_known"
+                android:id="@+id/plant_also_known_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
@@ -62,7 +62,7 @@
                 android:id="@+id/plant_also_known_description"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/plant_also_known"
+                app:layout_constraintTop_toBottomOf="@id/plant_also_known_title"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:paddingStart="16dp"
@@ -70,7 +70,7 @@
                 />
 
         <TextView
-                android:id="@+id/plant_summary"
+                android:id="@+id/plant_summary_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
@@ -87,7 +87,7 @@
                 android:id="@+id/plant_summary_description"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/plant_summary"
+                app:layout_constraintTop_toBottomOf="@id/plant_summary_title"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:paddingStart="16dp"
@@ -95,7 +95,7 @@
                 />
 
         <TextView
-                android:id="@+id/plant_feature"
+                android:id="@+id/plant_feature_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
@@ -112,7 +112,7 @@
                 android:id="@+id/plant_feature_description"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/plant_feature"
+                app:layout_constraintTop_toBottomOf="@id/plant_feature_title"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:paddingStart="16dp"
@@ -120,7 +120,7 @@
                 />
 
         <TextView
-                android:id="@+id/plant_functionality"
+                android:id="@+id/plant_functionality_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
@@ -137,7 +137,7 @@
                 android:id="@+id/plant_functionality_description"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/plant_functionality"
+                app:layout_constraintTop_toBottomOf="@id/plant_functionality_title"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:paddingStart="16dp"
