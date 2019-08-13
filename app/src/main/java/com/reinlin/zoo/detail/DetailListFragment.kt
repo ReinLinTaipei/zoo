@@ -1,6 +1,8 @@
 package com.reinlin.zoo.detail
 
+import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,10 +19,12 @@ import com.reinlin.zoo.common.toast
 import com.reinlin.zoo.plant.PlantDetailFragment
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_detail_list.*
+import java.util.logging.Logger
 
 class DetailListFragment: Fragment(), IZooContract.DetailView, IZooContract.IAdapter<Data> {
 
     lateinit var presenter: IZooContract.DetailPresenter
+    private var mainListener: IZooContract.MainView? = null
     private val event = MutableLiveData<ZooViewEvent>()
 
     companion object {
@@ -37,9 +41,14 @@ class DetailListFragment: Fragment(), IZooContract.DetailView, IZooContract.IAda
         }
     }
 
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        if (context is IZooContract.MainView) mainListener = context
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        presenter.getDataManager().setExhibit(arguments)
+        presenter.getDataManager().initData(arguments)
         event.observe(this, Observer {
             presenter.observe(it)
         })
@@ -52,14 +61,19 @@ class DetailListFragment: Fragment(), IZooContract.DetailView, IZooContract.IAda
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        (activity as MainActivity).toolbarTitle(presenter.getDataManager().exhibit?.name)
+        mainListener?.setToolbarTitle(presenter.getDataManager().exhibit?.name)
+
         detail_list.apply {
             layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
             adapter = DetailListAdapter(presenter.getDataManager(), this@DetailListFragment)
         }
 
         detail_swipe.setOnRefreshListener {
-            event.value = ZooViewEvent.FetchPlants(presenter.getDataManager().exhibit?.name)
+                presenter.getDataManager().apply {
+                    val count = presenter.getDataManager().refresh()
+                    detail_list.adapter?.notifyItemRangeRemoved(1, count - 1)
+                    if (isAnimating().not()) event.value = ZooViewEvent.FetchPlants(getKeyword())
+                }
         }
 
         if (presenter.getDataManager().fromBack.not()) {
@@ -69,11 +83,15 @@ class DetailListFragment: Fragment(), IZooContract.DetailView, IZooContract.IAda
     }
 
     override fun onFetchDone(result: Zoo) {
+        Log.i(TAG, "onFetchDone detail list")
         detail_swipe.isRefreshing = false
         when(result) {
             is Zoo.Plants -> {
-                presenter.getDataManager().setData(result)
-                (detail_list.adapter as DetailListAdapter).notifyItemRangeInserted(1, presenter.getDataManager().data.size - 1)
+                presenter.getDataManager().addPlants(result)
+                if (isAnimating().not())
+                    (detail_list.adapter as DetailListAdapter).apply {
+                        notifyItemRangeInserted(1, itemCount - 1)
+                    }
             }
             is Zoo.NoData -> {}
             is Zoo.Exception -> { context?.toast(result.message)}
@@ -88,12 +106,7 @@ class DetailListFragment: Fragment(), IZooContract.DetailView, IZooContract.IAda
             is Data.Plant -> {
                 activity?.let {
                     presenter.getDataManager().fromBack = true
-                    PlantDetailFragment.instance(data).apply {
-                        ZooInjector().buildPlantManager(this)
-                        it.attachFragment(it.supportFragmentManager,
-                            this,
-                            DETAIL_PLANT)
-                    }
+                    mainListener?.nextPage(InjectEvent.Plant(data))
                 }
             }
         }
@@ -105,5 +118,6 @@ class DetailListFragment: Fragment(), IZooContract.DetailView, IZooContract.IAda
     override fun onDestroy() {
         super.onDestroy()
         presenter.clear()
+        mainListener = null
     }
 }

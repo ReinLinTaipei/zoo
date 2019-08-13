@@ -15,7 +15,9 @@ class DetailListManager {
         return exhibit?.name?.splitC("(")
     }
 
-    fun setExhibit(argument: Bundle?) {
+    fun initData(argument: Bundle?) {
+        data.clear()
+        fromBack = false
         argument?.let { 
             exhibit = Data.Exhibit(
                 id = 0,
@@ -29,11 +31,16 @@ class DetailListManager {
             }
         }
     }
-    
-    fun setData(plants: Zoo.Plants) {
-        for (i in data.size - 1 downTo 1) {
+
+    fun refresh(): Int {
+        fromBack = false
+        val lastCount = data.size
+        for (i in data.size - 1 downTo 1)
             data.removeAt(i)
-        }
+        return lastCount
+    }
+
+    fun addPlants(plants: Zoo.Plants) {
         plants.plants.map {
             data.add(it)
         }

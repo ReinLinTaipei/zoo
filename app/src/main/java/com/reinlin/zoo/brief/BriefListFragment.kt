@@ -1,5 +1,6 @@
 package com.reinlin.zoo.brief
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -23,11 +24,17 @@ import kotlinx.android.synthetic.main.fragment_brief_list.*
 class BriefListFragment: Fragment(), IZooContract.BriefView, IZooContract.IAdapter<Data.Exhibit> {
 
     lateinit var presenter: IZooContract.BriefPresenter
+    private var mainListener: IZooContract.MainView? = null
     private val event = MutableLiveData<ZooViewEvent>()
 
     companion object {
         @JvmStatic
         fun instance() : BriefListFragment = BriefListFragment()
+    }
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        if (context is IZooContract.MainView) mainListener = context
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,7 +58,9 @@ class BriefListFragment: Fragment(), IZooContract.BriefView, IZooContract.IAdapt
         }
 
         brief_swipe.setOnRefreshListener {
-            event.value = ZooViewEvent.FetchExhibits
+            val count = presenter.getDataManager().clearData()
+            brief_list.adapter?.notifyItemRangeRemoved(0, count)
+            if (isAnimating().not()) event.value = ZooViewEvent.FetchExhibits
         }
         brief_swipe.isRefreshing = true
         event.value = ZooViewEvent.FetchExhibits
@@ -61,14 +70,7 @@ class BriefListFragment: Fragment(), IZooContract.BriefView, IZooContract.IAdapt
         brief_list.isAnimating
 
     override fun onItemClicked(data: Data.Exhibit) {
-        activity?.let {
-            DetailListFragment.instance(data).apply {
-                ZooInjector().buildDetailPresenter(this)
-                it.attachFragment(it.supportFragmentManager,
-                    this,
-                    DETAIL_EXHIBIT)
-            }
-        }
+        mainListener?.nextPage(InjectEvent.Detail(data))
     }
 
     override fun onFetchDone(result: Zoo) {
@@ -76,6 +78,7 @@ class BriefListFragment: Fragment(), IZooContract.BriefView, IZooContract.IAdapt
 
         when(result) {
             is Zoo.Exhibits -> {
+                Log.i(TAG, "fetch brief done! ${result.exhibits.size}")
                 (brief_list.adapter as? BriefListAdapter)?.apply {
                     dataManager.setData(result)
                     notifyDataSetChanged()
@@ -89,5 +92,6 @@ class BriefListFragment: Fragment(), IZooContract.BriefView, IZooContract.IAdapt
     override fun onDestroy() {
         super.onDestroy()
         presenter.clear()
+        mainListener = null
     }
 }

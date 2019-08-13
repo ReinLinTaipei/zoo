@@ -12,11 +12,12 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
-class DetailListPresenter(dispatcher: DispatcherProvider,
-                          private val service: IRemoteRepository,
-                          private val dataManager: DetailListManager,
-                          private val view: IZooContract.DetailView
-):
+class DetailListPresenter(
+    dispatcher: DispatcherProvider,
+    private val service: IRemoteRepository,
+    private val dataManager: DetailListManager,
+    private val view: IZooContract.DetailView
+) :
     BasePresenter(dispatcher),
     CoroutineScope,
     IZooContract.DetailPresenter {
@@ -38,14 +39,11 @@ class DetailListPresenter(dispatcher: DispatcherProvider,
         }
     }
 
-    private fun fetchPlants(keyword: String?) {
-        job = launch {
-            if (TextUtils.isEmpty(keyword).not()) {
-                val result = service.getPlants(0, keyword!!)
-                view.onFetchDone(result)
-            }
-            else
-                view.onFetchDone(Zoo.NoData)
-        }
+    private fun fetchPlants(keyword: String?) = launch {
+        if (TextUtils.isEmpty(keyword).not()) {
+            val result = service.getPlants(0, keyword!!)
+            view.onFetchDone(result)
+        } else
+            view.onFetchDone(Zoo.NoData)
     }
 }

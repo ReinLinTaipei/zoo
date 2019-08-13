@@ -30,7 +30,7 @@ class ZooInjector {
         PlantDetailManager()
     }
 
-    fun buildBriefPresenter(briefView: BriefListFragment) {
+    fun buildBriefPresenter(briefView: BriefListFragment): BriefListFragment =
         BriefListPresenter(
             DispatcherProvider,
             service = remoteRepository,
@@ -38,10 +38,10 @@ class ZooInjector {
             view = briefView
         ).let {
             briefView.presenter = it
+            briefView
         }
-    }
 
-    fun buildDetailPresenter(detailView: DetailListFragment) {
+    fun buildDetailPresenter(detailView: DetailListFragment): DetailListFragment =
         DetailListPresenter(
             DispatcherProvider,
             service = remoteRepository,
@@ -49,10 +49,11 @@ class ZooInjector {
             view = detailView
         ).let {
             detailView.presenter = it
+            detailView
         }
-    }
 
-    fun buildPlantManager(plantDetailView: PlantDetailFragment) {
-        plantDetailView.dataManager = plantDetailManager
-    }
+    fun buildPlantManager(plantDetailView: PlantDetailFragment): PlantDetailFragment =
+        plantDetailView.apply {
+            dataManager = plantDetailManager
+        }
 }

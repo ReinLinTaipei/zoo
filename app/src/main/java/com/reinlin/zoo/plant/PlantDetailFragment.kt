@@ -1,5 +1,6 @@
 package com.reinlin.zoo.plant
 
+import android.content.Context
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.LayoutInflater
@@ -9,6 +10,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.reinlin.domain.model.Data
+import com.reinlin.zoo.IZooContract
 import com.reinlin.zoo.MainActivity
 import com.reinlin.zoo.R
 import com.reinlin.zoo.common.*
@@ -17,6 +19,7 @@ import kotlinx.android.synthetic.main.fragment_plant_detail.*
 class PlantDetailFragment: Fragment() {
 
     lateinit var dataManager: PlantDetailManager
+    private var mainListener: IZooContract.MainView? = null
 
     companion object {
         @JvmStatic
@@ -35,11 +38,15 @@ class PlantDetailFragment: Fragment() {
         }
     }
 
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        if (context is IZooContract.MainView) mainListener = context
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         dataManager.setData(arguments)
-        (activity as MainActivity).toolbarTitle(dataManager.plant?.name)
+        mainListener?.setToolbarTitle(dataManager.plant?.name)
     }
 
 

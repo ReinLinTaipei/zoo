@@ -4,14 +4,15 @@ import android.app.Activity
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.reinlin.zoo.MainActivity
 import com.reinlin.zoo.R
 import kotlinx.android.synthetic.main.activity_main.*
 
-internal fun Activity.attachFragment(manager: FragmentManager, fragment: Fragment, tag: String) {
-    val transaction = manager.beginTransaction()
+internal fun AppCompatActivity.attachFragment(fragment: Fragment, tag: String) {
+    val transaction = supportFragmentManager.beginTransaction()
         .replace(R.id.container, fragment, tag)
     if (tag == BRIEF_LIST)
         transaction.commit()

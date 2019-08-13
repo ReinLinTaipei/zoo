@@ -16,4 +16,10 @@ class BriefListManager {
 
     fun getData(position: Int): Data.Exhibit? =
         if (position < data.size) data[position] else null
+
+    fun clearData(): Int {
+        val lastCount = data.size
+        data.clear()
+        return lastCount
+    }
 }
