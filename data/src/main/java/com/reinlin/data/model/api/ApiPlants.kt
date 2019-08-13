@@ -1,4 +1,4 @@
-package com.reinlin.data.model
+package com.reinlin.data.model.api
 
 import com.google.gson.annotations.SerializedName
 import com.reinlin.domain.model.Data

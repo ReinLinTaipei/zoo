@@ -78,7 +78,6 @@ class BriefListFragment: Fragment(), IZooContract.BriefView, IZooContract.IAdapt
 
         when(result) {
             is Zoo.Exhibits -> {
-                Log.i(TAG, "fetch brief done! ${result.exhibits.size}")
                 (brief_list.adapter as? BriefListAdapter)?.apply {
                     dataManager.setData(result)
                     notifyDataSetChanged()

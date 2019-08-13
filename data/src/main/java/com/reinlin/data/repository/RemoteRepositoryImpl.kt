@@ -1,13 +1,12 @@
-package com.reinlin.data
+package com.reinlin.data.repository
 
-import com.reinlin.data.model.toExhibit
-import com.reinlin.data.model.toPlant
+import com.reinlin.data.service.IZooApiService
+import com.reinlin.data.model.api.toExhibit
+import com.reinlin.data.model.api.toPlant
 import com.reinlin.domain.model.Zoo
 import com.reinlin.domain.repository.IRemoteRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
-class ZooRepositoryImpl : IRemoteRepository {
+class RemoteRepositoryImpl : IRemoteRepository {
 
     private val service = IZooApiService.instance()
 

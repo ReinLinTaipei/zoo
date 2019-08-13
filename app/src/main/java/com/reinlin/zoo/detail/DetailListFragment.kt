@@ -83,7 +83,6 @@ class DetailListFragment: Fragment(), IZooContract.DetailView, IZooContract.IAda
     }
 
     override fun onFetchDone(result: Zoo) {
-        Log.i(TAG, "onFetchDone detail list")
         detail_swipe.isRefreshing = false
         when(result) {
             is Zoo.Plants -> {

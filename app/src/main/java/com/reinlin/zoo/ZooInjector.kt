@@ -1,6 +1,6 @@
 package com.reinlin.zoo
 
-import com.reinlin.data.ZooRepositoryImpl
+import com.reinlin.data.repository.RemoteRepositoryImpl
 import com.reinlin.domain.repository.IRemoteRepository
 import com.reinlin.zoo.brief.BriefListFragment
 import com.reinlin.zoo.brief.BriefListManager
@@ -15,7 +15,7 @@ import com.reinlin.zoo.plant.PlantDetailManager
 class ZooInjector {
 
     private val remoteRepository: IRemoteRepository by lazy {
-        ZooRepositoryImpl()
+        RemoteRepositoryImpl()
     }
 
     private val exhibitListManager: BriefListManager by lazy {
