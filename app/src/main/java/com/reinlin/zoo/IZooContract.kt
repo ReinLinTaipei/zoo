@@ -1,6 +1,7 @@
 package com.reinlin.zoo
 
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
 import com.reinlin.domain.model.Data
 import com.reinlin.domain.model.Zoo
 import com.reinlin.zoo.brief.BriefListManager
@@ -28,6 +29,7 @@ interface IZooContract {
 
     interface BriefPresenter {
         fun getDataManager(): BriefListManager
+        fun getExhibits(): LiveData<List<Data.Exhibit>>
         fun observe(event: ZooViewEvent)
         fun clear()
     }
@@ -40,7 +42,7 @@ interface IZooContract {
 }
 
 sealed class ZooViewEvent {
-    object FetchExhibits: ZooViewEvent()
+    data class FetchExhibits(val offset: Int): ZooViewEvent()
     data class FetchPlants(val keyword: String?): ZooViewEvent()
 }
 

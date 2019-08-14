@@ -1,18 +1,15 @@
 package com.reinlin.zoo.brief
-
 import com.reinlin.domain.model.Data
-import com.reinlin.domain.model.Zoo
 
 class BriefListManager {
 
-    val data: ArrayList<Data.Exhibit> = arrayListOf()
+    private val data: ArrayList<Data.Exhibit> = arrayListOf()
 
-    fun setData(exhibits: Zoo.Exhibits) {
-        data.clear()
-        exhibits.exhibits.map {
-            data.add(it)
-        }
+    fun setData(exhibits: List<Data.Exhibit>): Int {
+        data.addAll(exhibits)
+        return getCount()
     }
+
 
     fun getData(position: Int): Data.Exhibit? =
         if (position < data.size) data[position] else null
@@ -22,4 +19,10 @@ class BriefListManager {
         data.clear()
         return lastCount
     }
+
+    fun getNextOffset(): Int = if (data.size > 0) data.size else 0
+
+    fun getCount() = data.size
 }
+
+

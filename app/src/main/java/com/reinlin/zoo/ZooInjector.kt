@@ -1,6 +1,12 @@
 package com.reinlin.zoo
 
+import android.app.Application
+import androidx.lifecycle.LiveData
+import com.reinlin.data.repository.LocalRepositoryImpl
 import com.reinlin.data.repository.RemoteRepositoryImpl
+import com.reinlin.data.service.db.ZooDatabase
+import com.reinlin.domain.model.Data
+import com.reinlin.domain.repository.ILocalRepository
 import com.reinlin.domain.repository.IRemoteRepository
 import com.reinlin.zoo.brief.BriefListFragment
 import com.reinlin.zoo.brief.BriefListManager
@@ -12,10 +18,18 @@ import com.reinlin.zoo.detail.DetailListPresenter
 import com.reinlin.zoo.plant.PlantDetailFragment
 import com.reinlin.zoo.plant.PlantDetailManager
 
-class ZooInjector {
+class ZooInjector(application: Application) {
 
     private val remoteRepository: IRemoteRepository by lazy {
         RemoteRepositoryImpl()
+    }
+
+    private val database: ZooDatabase by lazy {
+        ZooDatabase.getDatabase(application.applicationContext)
+    }
+
+    private val localRepository: ILocalRepository by lazy {
+        LocalRepositoryImpl(database.exhibitDao(), database.plantDao())
     }
 
     private val exhibitListManager: BriefListManager by lazy {
@@ -33,7 +47,8 @@ class ZooInjector {
     fun buildBriefPresenter(briefView: BriefListFragment): BriefListFragment =
         BriefListPresenter(
             DispatcherProvider,
-            service = remoteRepository,
+            remoteService = remoteRepository,
+            localService = localRepository,
             dataManager = exhibitListManager,
             view = briefView
         ).let {

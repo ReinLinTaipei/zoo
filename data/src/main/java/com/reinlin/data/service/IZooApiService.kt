@@ -11,7 +11,8 @@ internal interface IZooApiService {
 
     @GET("apiAccess?scope=$SCOPE&rid=$RID_EXHIBIT")
     suspend fun getExhibits(
-        @Query("offset") offset: Int = 0
+        @Query("offset") offset: Int = 0,
+        @Query("limit") count: Int
     ): Response<ApiResult.Exhibits>
 
     @GET("apiAccess?scope=$SCOPE&rid=$RID_PLANTS")

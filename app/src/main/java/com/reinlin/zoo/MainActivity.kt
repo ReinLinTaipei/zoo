@@ -12,7 +12,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), IZooContract.MainView {
 
-    private val zooInjector: ZooInjector by lazy { ZooInjector() }
+    private val zooInjector: ZooInjector by lazy { ZooInjector(application) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -1,8 +1,8 @@
 package com.reinlin.data.repository
 
-import com.reinlin.data.service.IZooApiService
 import com.reinlin.data.model.api.toExhibit
 import com.reinlin.data.model.api.toPlant
+import com.reinlin.data.service.IZooApiService
 import com.reinlin.domain.model.Zoo
 import com.reinlin.domain.repository.IRemoteRepository
 
@@ -10,18 +10,20 @@ class RemoteRepositoryImpl : IRemoteRepository {
 
     private val service = IZooApiService.instance()
 
-    override suspend fun getExhibits(offset: Int): Zoo =
+    override suspend fun getExhibits(offset: Int, count: Int): Zoo =
         try {
-            service.getExhibits(offset).run {
+            service.getExhibits(offset, count).run {
                 if (this.isSuccessful) {
                     this.body()?.let {
-                        Zoo.Exhibits(
-                            it.result.offset,
-                            it.result.details.map { detail -> detail.toExhibit }
-                        )
+                        if (it.result.details.isEmpty())
+                            Zoo.NoData
+                        else
+                            Zoo.Exhibits(
+                                it.result.offset,
+                                it.result.details.map { detail -> detail.toExhibit }
+                            )
                     } ?: Zoo.NoData
-                }
-                else
+                } else
                     Zoo.NoData
             }
         } catch (e: Exception) {
@@ -39,8 +41,7 @@ class RemoteRepositoryImpl : IRemoteRepository {
                             it.result.details.map { detail -> detail.toPlant }
                         )
                     } ?: Zoo.NoData
-                }
-                else
+                } else
                     Zoo.NoData
 
             }

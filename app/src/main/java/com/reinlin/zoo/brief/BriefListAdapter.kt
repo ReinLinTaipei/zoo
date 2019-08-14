@@ -24,7 +24,7 @@ class BriefListAdapter(
     }
 
     override fun getItemCount(): Int =
-        dataManager.data.size
+        dataManager.getCount()
 
     class ViewHolder(view: View,
                      private val avatar: ImageView = view.findViewById(R.id.brief_avatar),
