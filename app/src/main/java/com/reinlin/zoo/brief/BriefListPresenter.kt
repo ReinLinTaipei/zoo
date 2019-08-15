@@ -42,11 +42,12 @@ class BriefListPresenter(dispatcher: DispatcherProvider,
 
     override fun observe(event: ZooViewEvent) {
         when(event) {
-            is ZooViewEvent.FetchExhibits -> fetchExhibits(event.offset)
+            is ZooViewEvent.UpdateExhibits -> fetchExhibits(event.offset)
         }
     }
 
     private fun fetchExhibits(offset: Int) = launch {
+            Log.i(TAG, "fetch offset: $offset")
             remoteService.getExhibits(offset, 10).let {
                 Log.i(TAG, "fetch done $it")
                 when (it) {

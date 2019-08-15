@@ -9,7 +9,7 @@ import com.reinlin.data.model.db.DbConverter
 import com.reinlin.data.model.db.DbExhibit
 import com.reinlin.data.model.db.DbPlant
 
-@Database(entities = [DbExhibit::class, DbPlant::class], version = 1, exportSchema = false)
+@Database(entities = [DbExhibit::class, DbPlant::class], version = 3, exportSchema = false)
 @TypeConverters(DbConverter::class)
 abstract class ZooDatabase : RoomDatabase() {
 
@@ -28,7 +28,9 @@ abstract class ZooDatabase : RoomDatabase() {
                     context.applicationContext,
                     ZooDatabase::class.java,
                     "Zoo_database"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration()
+                    .build()
                 INSTANCE = instance
                 instance
             }

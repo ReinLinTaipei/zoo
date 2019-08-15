@@ -42,7 +42,7 @@ interface IZooContract {
 }
 
 sealed class ZooViewEvent {
-    data class FetchExhibits(val offset: Int): ZooViewEvent()
+    data class UpdateExhibits(val offset: Int): ZooViewEvent()
     data class FetchPlants(val keyword: String?): ZooViewEvent()
 }
 

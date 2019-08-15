@@ -44,8 +44,11 @@ class BriefListFragment: Fragment(), IZooContract.BriefView, IZooContract.IAdapt
         presenter.getExhibits().observe(this, Observer {
             Log.i(TAG, "observe exhibit: ${it.size}")
             brief_swipe.isRefreshing = false
-            clearData()
-            if (isAnimating().not()) updateData(it)
+            dataManager.update(it, {
+                adapter.notifyItemInserted(this)
+            }, {
+                adapter.notifyItemChanged(this)
+            })
         })
     }
 
@@ -64,18 +67,11 @@ class BriefListFragment: Fragment(), IZooContract.BriefView, IZooContract.IAdapt
 
         brief_swipe.setOnRefreshListener {
             val offset = dataManager.getNextOffset()
-            clearData()
-            if (isAnimating().not()) event.value = ZooViewEvent.FetchExhibits(offset)
+            if (isAnimating().not()) event.value = ZooViewEvent.UpdateExhibits(offset)
         }
         brief_swipe.isRefreshing = true
-        event.value = ZooViewEvent.FetchExhibits(0)
+        event.value = ZooViewEvent.UpdateExhibits(0)
     }
-
-    private fun clearData() =
-        adapter.notifyItemRangeRemoved(0, dataManager.clearData())
-
-    private fun updateData(exhibits: List<Data.Exhibit>) =
-        adapter.notifyItemRangeInserted(0, dataManager.setData(exhibits))
 
     override fun isAnimating(): Boolean =
         brief_list.isAnimating

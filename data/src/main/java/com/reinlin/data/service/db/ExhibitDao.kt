@@ -9,7 +9,7 @@ import com.reinlin.data.model.db.DbExhibit
 @Dao
 interface ExhibitDao {
 
-    @Query("SELECT * FROM exhibit_table ORDER BY id ASC")
+    @Query("SELECT * FROM exhibit_table ORDER BY id DESC")
     suspend fun getData(): List<DbExhibit>
 
     @Query("SELECT * FROM exhibit_table WHERE id >= :startId ORDER BY id ASC LIMIT :limit")
