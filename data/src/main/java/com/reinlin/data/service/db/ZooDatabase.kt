@@ -4,13 +4,9 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
-import com.reinlin.data.model.db.DbConverter
-import com.reinlin.data.model.db.DbExhibit
-import com.reinlin.data.model.db.DbPlant
+import com.reinlin.data.model.local.DbZoo
 
-@Database(entities = [DbExhibit::class, DbPlant::class], version = 3, exportSchema = false)
-@TypeConverters(DbConverter::class)
+@Database(entities = [DbZoo.Exhibit::class, DbZoo.Plant::class], version = 1, exportSchema = false)
 abstract class ZooDatabase : RoomDatabase() {
 
     abstract fun exhibitDao(): ExhibitDao

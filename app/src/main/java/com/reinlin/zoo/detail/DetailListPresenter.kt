@@ -1,6 +1,9 @@
 package com.reinlin.zoo.detail
 
 import android.text.TextUtils
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.liveData
+import com.reinlin.domain.model.Data
 import com.reinlin.domain.model.Zoo
 import com.reinlin.domain.repository.IRemoteRepository
 import com.reinlin.zoo.IZooContract
@@ -20,7 +23,13 @@ class DetailListPresenter(
 ) :
     BasePresenter(dispatcher),
     CoroutineScope,
-    IZooContract.DetailPresenter {
+    IZooContract.ViewPresenter<DetailListManager> {
+
+
+    override val dataFromDB: LiveData<List<Data>>
+        get() = liveData {
+
+        }
 
     init {
         job = Job()

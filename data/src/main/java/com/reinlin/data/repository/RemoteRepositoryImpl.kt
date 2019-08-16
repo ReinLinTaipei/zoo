@@ -1,7 +1,7 @@
 package com.reinlin.data.repository
 
-import com.reinlin.data.model.api.toExhibit
-import com.reinlin.data.model.api.toPlant
+import com.reinlin.data.model.remote.toExhibit
+import com.reinlin.data.model.remote.toPlant
 import com.reinlin.data.service.IZooApiService
 import com.reinlin.domain.model.Zoo
 import com.reinlin.domain.repository.IRemoteRepository

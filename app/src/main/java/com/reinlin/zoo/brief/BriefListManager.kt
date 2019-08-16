@@ -7,18 +7,18 @@ class BriefListManager {
 
     fun update(updates: List<Data.Exhibit>, insert: Int.() -> Unit, notify: Int.() -> Unit): Int {
         updates.forEachIndexed { index, update ->
-            updateItem(index, update, data.singleOrNull { it.id == update.id }, { compare, target ->
-                if (target.name.equals(compare.name).not()) return@updateItem true
-                if (target.info.equals(compare.info).not()) return@updateItem true
-                return@updateItem false
+            compareItem(index, update, data.singleOrNull { it.id == update.id }, { compare, target ->
+                if (target.name.equals(compare.name).not()) return@compareItem true
+                if (target.info.equals(compare.info).not()) return@compareItem true
+                return@compareItem false
             }, insert, notify)
         }
         return getCount()
     }
 
-    private fun updateItem(index: Int, update: Data.Exhibit, origin: Data.Exhibit?,
-                           isDiff: (origin: Data.Exhibit, update: Data.Exhibit) -> Boolean,
-                           insert:(Int) -> Unit, notify: (Int) -> Unit) {
+    private fun compareItem(index: Int, update: Data.Exhibit, origin: Data.Exhibit?,
+                            isDiff: (origin: Data.Exhibit, update: Data.Exhibit) -> Boolean,
+                            insert:(Int) -> Unit, notify: (Int) -> Unit) {
         origin?.let {
             if (isDiff(origin, update)) {
                 data[index] = update

@@ -4,20 +4,20 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.reinlin.data.model.db.DbExhibit
+import com.reinlin.data.model.local.DbZoo
 
 @Dao
 interface ExhibitDao {
 
-    @Query("SELECT * FROM exhibit_table ORDER BY id DESC")
-    suspend fun getData(): List<DbExhibit>
+    @Query("SELECT * FROM table_exhibit ORDER BY id DESC")
+    suspend fun getData(): List<DbZoo.Exhibit>
 
-    @Query("SELECT * FROM exhibit_table WHERE id >= :startId ORDER BY id ASC LIMIT :limit")
-    suspend fun getExhibits(startId: Int, limit: Int = 10): List<DbExhibit>
+    @Query("SELECT * FROM table_exhibit WHERE id >= :startId ORDER BY id ASC LIMIT :limit")
+    suspend fun getExhibits(startId: Int, limit: Int = 10): List<DbZoo.Exhibit>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(exhibit: DbExhibit)
+    suspend fun insert(exhibit: DbZoo.Exhibit)
 
-    @Query("DELETE FROM exhibit_table")
+    @Query("DELETE FROM table_exhibit")
     fun deleteAll()
 }

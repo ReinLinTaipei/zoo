@@ -1,4 +1,4 @@
-package com.reinlin.data.model.api
+package com.reinlin.data.model.remote
 
 import com.google.gson.annotations.SerializedName
 

@@ -1,10 +1,10 @@
 package com.reinlin.data.repository
 
 import androidx.annotation.WorkerThread
-import com.reinlin.data.model.db.toData
-import com.reinlin.data.model.db.toEntity
 import com.reinlin.data.service.db.ExhibitDao
 import com.reinlin.data.service.db.PlantDao
+import com.reinlin.data.model.local.toData
+import com.reinlin.data.model.local.toEntity
 import com.reinlin.domain.model.Data
 import com.reinlin.domain.repository.ILocalRepository
 

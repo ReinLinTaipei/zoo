@@ -27,22 +27,16 @@ interface IZooContract {
         fun onItemClicked(data: T)
     }
 
-    interface BriefPresenter {
-        fun getDataManager(): BriefListManager
-        fun getExhibits(): LiveData<List<Data.Exhibit>>
-        fun observe(event: ZooViewEvent)
-        fun clear()
-    }
-
-    interface DetailPresenter {
-        fun getDataManager(): DetailListManager
+    interface ViewPresenter<out T> {
+        val dataFromDB: LiveData<List<Data>>
+        fun getDataManager(): T
         fun observe(event: ZooViewEvent)
         fun clear()
     }
 }
 
 sealed class ZooViewEvent {
-    data class UpdateExhibits(val offset: Int): ZooViewEvent()
+    data class FetchExhibits(val offset: Int): ZooViewEvent()
     data class FetchPlants(val keyword: String?): ZooViewEvent()
 }
 

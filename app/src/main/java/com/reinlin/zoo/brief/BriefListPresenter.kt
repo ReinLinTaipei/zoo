@@ -23,7 +23,7 @@ class BriefListPresenter(dispatcher: DispatcherProvider,
 ):
     BasePresenter(dispatcher),
     CoroutineScope,
-    IZooContract.BriefPresenter {
+    IZooContract.ViewPresenter<BriefListManager> {
 
     init {
         job = Job()
@@ -34,26 +34,28 @@ class BriefListPresenter(dispatcher: DispatcherProvider,
 
     override fun clear() = job.cancel()
 
-    override fun getExhibits(): LiveData<List<Data.Exhibit>> = liveData {
-        emit(localService.getExhibits())
-    }
+    override val dataFromDB: LiveData<List<Data>>
+        get() = liveData {
+            Log.i(TAG, "live data watch local db")
+            emit(localService.getExhibits().map { it as Data })
+        }
 
     override fun getDataManager(): BriefListManager = dataManager
 
     override fun observe(event: ZooViewEvent) {
         when(event) {
-            is ZooViewEvent.UpdateExhibits -> fetchExhibits(event.offset)
+            is ZooViewEvent.FetchExhibits -> fetchExhibits(event.offset)
         }
     }
 
     private fun fetchExhibits(offset: Int) = launch {
-            Log.i(TAG, "fetch offset: $offset")
+            Log.i(TAG, "fetch start, offset: $offset")
             remoteService.getExhibits(offset, 10).let {
-                Log.i(TAG, "fetch done $it")
                 when (it) {
                     is Zoo.Exhibits -> {
+                        Log.i(TAG, "fetch done: ${it.exhibits.size}")
                         it.exhibits.map { exhibit ->
-                            Log.i(TAG, "fetch done ${exhibit.name}")
+                            Log.i(TAG, "add data in db ${exhibit.name}")
                             localService.insert(exhibit)
                         }
                     }

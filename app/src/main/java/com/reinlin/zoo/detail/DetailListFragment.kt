@@ -23,7 +23,7 @@ import java.util.logging.Logger
 
 class DetailListFragment: Fragment(), IZooContract.DetailView, IZooContract.IAdapter<Data> {
 
-    lateinit var presenter: IZooContract.DetailPresenter
+    lateinit var presenter: IZooContract.ViewPresenter<DetailListManager>
     private var mainListener: IZooContract.MainView? = null
     private val event = MutableLiveData<ZooViewEvent>()
 

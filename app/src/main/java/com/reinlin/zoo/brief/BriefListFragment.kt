@@ -20,7 +20,7 @@ import kotlinx.android.synthetic.main.fragment_brief_list.*
 
 class BriefListFragment: Fragment(), IZooContract.BriefView, IZooContract.IAdapter<Data.Exhibit> {
 
-    lateinit var presenter: IZooContract.BriefPresenter
+    lateinit var presenter: IZooContract.ViewPresenter<BriefListManager>
     private var mainListener: IZooContract.MainView? = null
     private val event = MutableLiveData<ZooViewEvent>()
     private val dataManager: BriefListManager by lazy { presenter.getDataManager() }
@@ -41,14 +41,17 @@ class BriefListFragment: Fragment(), IZooContract.BriefView, IZooContract.IAdapt
         event.observe(this, Observer {
             presenter.observe(it)
         })
-        presenter.getExhibits().observe(this, Observer {
-            Log.i(TAG, "observe exhibit: ${it.size}")
+        presenter.dataFromDB.observe(this, Observer { data ->
+            Log.i(TAG, "observe db(exhibits): ${data.size}")
             brief_swipe.isRefreshing = false
-            dataManager.update(it, {
-                adapter.notifyItemInserted(this)
-            }, {
-                adapter.notifyItemChanged(this)
-            })
+            data.filterIsInstance<Data.Exhibit>()
+                .let {
+                    dataManager.update(it, {
+                        adapter.notifyItemInserted(this)
+                    }, {
+                        adapter.notifyItemChanged(this)
+                    })
+                }
         })
     }
 
@@ -67,10 +70,10 @@ class BriefListFragment: Fragment(), IZooContract.BriefView, IZooContract.IAdapt
 
         brief_swipe.setOnRefreshListener {
             val offset = dataManager.getNextOffset()
-            if (isAnimating().not()) event.value = ZooViewEvent.UpdateExhibits(offset)
+            if (isAnimating().not()) event.value = ZooViewEvent.FetchExhibits(offset)
         }
         brief_swipe.isRefreshing = true
-        event.value = ZooViewEvent.UpdateExhibits(0)
+        event.value = ZooViewEvent.FetchExhibits(0)
     }
 
     override fun isAnimating(): Boolean =

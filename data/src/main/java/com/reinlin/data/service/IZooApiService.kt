@@ -1,6 +1,6 @@
 package com.reinlin.data.service
 
-import com.reinlin.data.model.api.ApiResult
+import com.reinlin.data.model.remote.ApiResult
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
