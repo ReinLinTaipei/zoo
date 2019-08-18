@@ -1,6 +1,9 @@
 package com.reinlin.data.repository
 
 import androidx.annotation.WorkerThread
+import androidx.arch.core.util.Function
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Transformations
 import com.reinlin.data.service.db.ExhibitDao
 import com.reinlin.data.service.db.PlantDao
 import com.reinlin.data.model.local.toData
@@ -14,11 +17,16 @@ class LocalRepositoryImpl(
     private val plantDao: PlantDao
 ) : ILocalRepository {
 
-    override suspend fun getExhibits(): List<Data.Exhibit> =
-        exhibitDao.getData().map { it.toData }
 
-    override suspend fun getPlants(): List<Data.Plant> =
-        plantDao.getData().map { it.toData }
+    val exhibitsFromDB: LiveData<List<Data.Exhibit>>
+        get() = Transformations.map(exhibitDao.getData()) {
+            it.map { db -> db.toData }
+        }
+
+    val plantsFromDB: LiveData<List<Data.Plant>>
+        get() = Transformations.map(plantDao.getData()) {
+            it.map { db -> db.toData }
+        }
 
     override suspend fun getExhibits(startId: Int, count: Int): List<Data.Exhibit> =
         exhibitDao.getExhibits(startId, count).map { it.toData }

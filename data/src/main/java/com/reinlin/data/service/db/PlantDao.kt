@@ -1,5 +1,6 @@
 package com.reinlin.data.service.db
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -10,7 +11,7 @@ import com.reinlin.data.model.local.DbZoo
 interface PlantDao {
 
     @Query("SELECT * FROM table_plant ORDER BY id ASC")
-    fun getData(): List<DbZoo.Plant>
+    fun getData(): LiveData<List<DbZoo.Plant>>
 
     @Query("SELECT * FROM table_plant WHERE id >= :startId ORDER BY id ASC LIMIT :limit")
     fun getPlants(startId: Int, limit: Int): List<DbZoo.Plant>

@@ -42,7 +42,7 @@ class BriefListFragment: Fragment(), IZooContract.BriefView, IZooContract.IAdapt
             presenter.observe(it)
         })
         presenter.dataFromDB.observe(this, Observer { data ->
-            Log.i(TAG, "observe db(exhibits): ${data.size}")
+            Log.i(TAG, "observe exhibits from DB: ${data.size}")
             brief_swipe.isRefreshing = false
             data.filterIsInstance<Data.Exhibit>()
                 .let {

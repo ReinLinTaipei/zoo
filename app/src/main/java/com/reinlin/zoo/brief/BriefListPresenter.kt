@@ -2,7 +2,7 @@ package com.reinlin.zoo.brief
 
 import android.util.Log
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.liveData
+import androidx.lifecycle.Transformations
 import com.reinlin.domain.model.Data
 import com.reinlin.domain.model.Zoo
 import com.reinlin.domain.repository.ILocalRepository
@@ -18,6 +18,7 @@ import kotlin.coroutines.CoroutineContext
 class BriefListPresenter(dispatcher: DispatcherProvider,
                          private val remoteService: IRemoteRepository,
                          private val localService: ILocalRepository,
+                         data: LiveData<List<Data.Exhibit>>,
                          private val dataManager: BriefListManager,
                          private val view: IZooContract.BriefView
 ):
@@ -34,11 +35,8 @@ class BriefListPresenter(dispatcher: DispatcherProvider,
 
     override fun clear() = job.cancel()
 
-    override val dataFromDB: LiveData<List<Data>>
-        get() = liveData {
-            Log.i(TAG, "live data watch local db")
-            emit(localService.getExhibits().map { it as Data })
-        }
+    override val dataFromDB: LiveData<List<Data>> =
+        Transformations.map(data) { it.map { db -> db as Data } }
 
     override fun getDataManager(): BriefListManager = dataManager
 
@@ -50,6 +48,7 @@ class BriefListPresenter(dispatcher: DispatcherProvider,
 
     private fun fetchExhibits(offset: Int) = launch {
             Log.i(TAG, "fetch start, offset: $offset")
+
             remoteService.getExhibits(offset, 10).let {
                 when (it) {
                     is Zoo.Exhibits -> {

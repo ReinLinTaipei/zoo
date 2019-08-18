@@ -19,10 +19,10 @@
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 app:contentScrim="?attr/colorPrimary"
                 app:expandedTitleGravity="top"
-                app:layout_scrollFlags="scroll|enterAlwaysCollapsed|snap">
+                app:layout_scrollFlags="scroll|enterAlways|snap">
 
             <androidx.appcompat.widget.Toolbar
                     android:id="@+id/toolbar"

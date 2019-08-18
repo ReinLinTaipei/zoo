@@ -23,18 +23,19 @@ class DetailListAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when (holder) {
-            is DetailHolder -> holder.bind(dataManager.data[position] as Data.Exhibit, listener::onItemClicked)
-            is PlantHolder  -> holder.bind(dataManager.data[position] as Data.Plant, listener::onItemClicked)
-        }
+        if (position > -1)
+            when (holder) {
+                is DetailHolder -> holder.bind(dataManager.getData(position) as Data.Exhibit, listener::onItemClicked)
+                is PlantHolder  -> holder.bind(dataManager.getData(position) as Data.Plant, listener::onItemClicked)
+            }
     }
 
     override fun getItemCount(): Int =
-        dataManager.data.size
+        dataManager.getCount()
 
     override fun getItemViewType(position: Int): Int {
-        return if (position >= 0 && position < dataManager.data.size) {
-            when(dataManager.data[position]) {
+        return if (position >= 0 && position < dataManager.getCount()) {
+            when(dataManager.getData(position)) {
                 is Data.Exhibit -> R.layout.item_detail
                 is Data.Plant   -> R.layout.item_brief
                 else -> super.getItemViewType(position)

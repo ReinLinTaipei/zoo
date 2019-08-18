@@ -5,10 +5,9 @@ import com.reinlin.domain.model.Data
 import com.reinlin.domain.model.Zoo
 import com.reinlin.zoo.common.*
 
-class DetailListManager {
+class DetailListManager : BaseManager<Data>() {
 
-    val data: ArrayList<Data> = arrayListOf()
-    var exhibit: Data.Exhibit? = null 
+    var exhibit: Data.Exhibit? = null
     var fromBack = false
 
     fun getKeyword(): String? {
@@ -18,7 +17,7 @@ class DetailListManager {
     fun initData(argument: Bundle?) {
         data.clear()
         fromBack = false
-        argument?.let { 
+        argument?.let {
             exhibit = Data.Exhibit(
                 id = 0,
                 name = it.getString(BUNDLE_NAME),
@@ -26,8 +25,8 @@ class DetailListManager {
                 picUrl = it.getString(BUNDLE_PIC),
                 URL = it.getString(BUNDLE_URL),
                 category = null
-            ).also { exhibit -> 
-                data.add(exhibit)       
+            ).also { exhibit ->
+                data.add(exhibit)
             }
         }
     }
@@ -40,9 +39,18 @@ class DetailListManager {
         return lastCount
     }
 
-    fun addPlants(plants: Zoo.Plants) {
-        plants.plants.map {
-            data.add(it)
+    fun update(updates: List<Data.Plant>, insert: Int.() -> Unit, notify: Int.() -> Unit): Int {
+        updates.forEachIndexed { index, update ->
+            compareItem(index, update,
+                data.filterIsInstance<Data.Plant>().
+                    singleOrNull { it.id == update.id }, { compare, target ->
+                    val old = compare as Data.Plant
+                    val refresh = target as Data.Plant
+                if (old.name.equals(refresh.name).not()) return@compareItem true
+                if (old.detail.equals(refresh.detail).not()) return@compareItem true
+                return@compareItem false
+            }, insert, notify)
         }
+        return getCount()
     }
 }

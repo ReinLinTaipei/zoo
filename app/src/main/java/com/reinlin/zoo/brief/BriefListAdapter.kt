@@ -13,7 +13,7 @@ import com.reinlin.zoo.R
 import com.reinlin.zoo.common.BRIEF_INFO_LENGTH
 
 class BriefListAdapter(
-    val dataManager: BriefListManager,
+    private val dataManager: BriefListManager,
     private val listener: IZooContract.IAdapter<Data.Exhibit>): RecyclerView.Adapter<BriefListAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder

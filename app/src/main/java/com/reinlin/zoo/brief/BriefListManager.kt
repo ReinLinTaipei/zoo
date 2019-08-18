@@ -1,9 +1,8 @@
 package com.reinlin.zoo.brief
 import com.reinlin.domain.model.Data
+import com.reinlin.zoo.common.BaseManager
 
-class BriefListManager {
-
-    private val data: ArrayList<Data.Exhibit> = arrayListOf()
+class BriefListManager: BaseManager<Data.Exhibit>() {
 
     fun update(updates: List<Data.Exhibit>, insert: Int.() -> Unit, notify: Int.() -> Unit): Int {
         updates.forEachIndexed { index, update ->
@@ -15,27 +14,6 @@ class BriefListManager {
         }
         return getCount()
     }
-
-    private fun compareItem(index: Int, update: Data.Exhibit, origin: Data.Exhibit?,
-                            isDiff: (origin: Data.Exhibit, update: Data.Exhibit) -> Boolean,
-                            insert:(Int) -> Unit, notify: (Int) -> Unit) {
-        origin?.let {
-            if (isDiff(origin, update)) {
-                data[index] = update
-                notify(index)
-            }
-        } ?: let {
-            data.add(update)
-            insert(data.size-1)
-        }
-    }
-
-    fun getData(position: Int): Data.Exhibit? =
-        if (position < data.size) data[position] else null
-
-    fun getNextOffset(): Int = data.size
-
-    fun getCount() = data.size
 }
 
 

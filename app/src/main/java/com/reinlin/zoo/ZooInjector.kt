@@ -49,6 +49,7 @@ class ZooInjector(application: Application) {
             DispatcherProvider,
             remoteService = remoteRepository,
             localService = localRepository,
+            data = (localRepository as LocalRepositoryImpl).exhibitsFromDB,
             dataManager = exhibitListManager,
             view = briefView
         ).let {
@@ -59,7 +60,9 @@ class ZooInjector(application: Application) {
     fun buildDetailPresenter(detailView: DetailListFragment): DetailListFragment =
         DetailListPresenter(
             DispatcherProvider,
-            service = remoteRepository,
+            remoteService = remoteRepository,
+            localService = localRepository,
+            data = (localRepository as LocalRepositoryImpl).plantsFromDB,
             dataManager = detailListManager,
             view = detailView
         ).let {

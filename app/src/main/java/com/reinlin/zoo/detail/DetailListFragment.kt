@@ -26,6 +26,8 @@ class DetailListFragment: Fragment(), IZooContract.DetailView, IZooContract.IAda
     lateinit var presenter: IZooContract.ViewPresenter<DetailListManager>
     private var mainListener: IZooContract.MainView? = null
     private val event = MutableLiveData<ZooViewEvent>()
+    private val dataManager: DetailListManager by lazy { presenter.getDataManager() }
+    private val adapter: DetailListAdapter? by lazy { detail_list.adapter as? DetailListAdapter }
 
     companion object {
         @JvmStatic
@@ -52,6 +54,16 @@ class DetailListFragment: Fragment(), IZooContract.DetailView, IZooContract.IAda
         event.observe(this, Observer {
             presenter.observe(it)
         })
+        presenter.dataFromDB.observe(this, Observer {
+            detail_swipe.isRefreshing = false
+            dataManager.update(it.map { db -> db as Data.Plant },
+                {
+                    adapter?.notifyItemInserted(this)
+                },
+                {
+                    adapter?.notifyItemChanged(this)
+                })
+        })
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -61,37 +73,30 @@ class DetailListFragment: Fragment(), IZooContract.DetailView, IZooContract.IAda
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mainListener?.setToolbarTitle(presenter.getDataManager().exhibit?.name)
+        mainListener?.setToolbarTitle(dataManager.exhibit?.name)
 
         detail_list.apply {
             layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-            adapter = DetailListAdapter(presenter.getDataManager(), this@DetailListFragment)
+            adapter = DetailListAdapter(dataManager, this@DetailListFragment)
         }
 
         detail_swipe.setOnRefreshListener {
-                presenter.getDataManager().apply {
-                    val count = presenter.getDataManager().refresh()
-                    detail_list.adapter?.notifyItemRangeRemoved(1, count - 1)
+            dataManager.apply {
+                    val count = dataManager.refresh()
+                    adapter?.notifyItemRangeRemoved(1, count - 1)
                     if (isAnimating().not()) event.value = ZooViewEvent.FetchPlants(getKeyword())
                 }
         }
 
-        if (presenter.getDataManager().fromBack.not()) {
+        if (dataManager.fromBack.not()) {
             detail_swipe.isRefreshing = true
-            event.value = ZooViewEvent.FetchPlants(presenter.getDataManager().getKeyword())
+            event.value = ZooViewEvent.FetchPlants(dataManager.getKeyword())
         }
     }
 
     override fun onFetchDone(result: Zoo) {
         detail_swipe.isRefreshing = false
         when(result) {
-            is Zoo.Plants -> {
-                presenter.getDataManager().addPlants(result)
-                if (isAnimating().not())
-                    (detail_list.adapter as DetailListAdapter).apply {
-                        notifyItemRangeInserted(1, itemCount - 1)
-                    }
-            }
             is Zoo.NoData -> {}
             is Zoo.Exception -> { context?.toast(result.message)}
         }
