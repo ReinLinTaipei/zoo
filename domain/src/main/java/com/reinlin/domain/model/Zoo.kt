@@ -14,7 +14,8 @@ sealed class Data {
         val info: String?,
         val category: String?,
         val picUrl: String?,
-        val URL: String?
+        val URL: String?,
+        val position: Int = -1
     ): Data()
 
     data class Plant(

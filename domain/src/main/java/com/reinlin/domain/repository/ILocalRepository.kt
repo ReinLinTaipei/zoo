@@ -4,9 +4,7 @@ import com.reinlin.domain.model.Data
 
 interface ILocalRepository {
 
-//    suspend fun getExhibits(): List<Data.Exhibit>
-//
-//    suspend fun getPlants(): List<Data.Plant>
+    suspend fun getExhibit(id: Int): Data.Exhibit
 
     suspend fun getExhibits(startId: Int, count: Int = 10): List<Data.Exhibit>
 
