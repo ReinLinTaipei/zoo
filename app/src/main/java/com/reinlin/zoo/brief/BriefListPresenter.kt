@@ -52,9 +52,7 @@ class BriefListPresenter(dispatcher: DispatcherProvider,
             remoteService.getExhibits(offset, 10).let {
                 when (it) {
                     is Zoo.Exhibits -> {
-                        Log.i(TAG, "fetch done: ${it.exhibits.size}")
                         it.exhibits.map { exhibit ->
-                            Log.i(TAG, "add data in db ${exhibit.name}")
                             localService.insert(exhibit)
                         }
                     }

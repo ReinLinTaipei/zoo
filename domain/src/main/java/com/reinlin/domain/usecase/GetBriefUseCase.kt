@@ -4,46 +4,69 @@ import com.reinlin.domain.model.Data
 import com.reinlin.domain.repository.ILocalRepository
 import com.reinlin.domain.repository.IRemoteRepository
 
-class GetBriefUseCase(val localRepository: ILocalRepository,
-                      val remoteRepository: IRemoteRepository) {
+const val CACHE_LIMIT = 10
 
+class GetBriefUseCase(
+    val localRepository: ILocalRepository,
+    val remoteRepository: IRemoteRepository
+) {
     private val cachedList = arrayListOf<Data.Exhibit>()
-    private val pendingList = arrayListOf<Int>()
+    private val pendingList = arrayListOf<Process.Pending>()
     private var localProcess: Process = Process.Stop
+    private var lastId = 0
 
-    fun fetchFromCached(position: Int, notify: (Data.Exhibit) -> Unit, queryLocal: (id: Int, position: Int) -> Unit) {
+    fun useCached(
+        position: Int,
+        notify: (Data.Exhibit) -> Unit,
+        queryLocal: (pending: Process.Pending) -> Unit
+    ) {
         cachedList.apply {
-            singleOrNull { it.position == position }
-                ?.let(notify)
-                ?:let {
-                    val nextId = if(isEmpty()) 0 else last().id + 1
-                    addPendingForQuery(nextId) {
-                        id ->  queryLocal(id, position)
-                    }
-                }
+                singleOrNull { it.position == position }
+                    ?.let(notify)
+                    ?: addPending(Process.Pending(position, ++lastId), queryLocal)
         }
     }
 
-    private fun addPendingForQuery(nextId: Int, queryLocal: (id: Int) -> Unit) {
-        pendingList.add(nextId)
-        if (localProcess is Process.Stop) {
+    private fun addPending(pending: Process.Pending,
+                           queryLocal: (pending: Process.Pending) -> Unit) {
+        pendingList.add(pending)
+        if (localProcess == Process.Stop) {
             localProcess = Process.Querying
-            queryLocal(pendingList.removeAt(0))
+            consumePending(queryLocal)
         }
     }
 
-    suspend fun fetchLocal(id: Int, position: Int, notify: (Data.Exhibit) -> Unit) {
-        val data = localRepository.getExhibit(id)
-        cachedList.removeAt(0)
-        cachedList.add(data.copy(position = position))
-        pendingList.remove(id)
-        notify(data)
-        if (pendingList.isEmpty())
-            localProcess = Process.Stop
+    private fun consumePending(queryLocal: (pending: Process.Pending) -> Unit) {
+        if (localProcess == Process.Querying) {
+            if (pendingList.isNotEmpty())
+                queryLocal(pendingList.removeAt(0))
+            else
+                localProcess = Process.Stop
+        }
+    }
+
+    suspend fun fetchLocal(
+        pending: Process.Pending,
+        notify: (Data.Exhibit) -> Unit,
+        queryLocal: (pending: Process.Pending) -> Unit
+    ) {
+//        localRepository.getExhibit(pending.id)?.let { data ->
+//            pendingList.remove(pending)
+//            addCached(data.copy(position = pending.position))
+//            notify(data)
+//        }
+
+        consumePending(queryLocal)
+    }
+
+    private fun addCached(data: Data.Exhibit) {
+        cachedList.add(data)
+        if (cachedList.size > CACHE_LIMIT) cachedList.removeAt(0)
     }
 
     sealed class Process {
-        object Stop: Process()
-        object Querying: Process()
+        object Stop : Process()
+        object Querying : Process()
+        data class Pending(val position: Int, val id: Int) : Process()
     }
 }
