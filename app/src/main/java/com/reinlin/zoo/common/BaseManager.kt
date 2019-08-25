@@ -22,7 +22,7 @@ open class BaseManager<T> {
     fun getData(position: Int): T? =
         if (position < data.size) data[position] else null
 
-    fun getNextOffset(): Int = data.size
+    fun getOffset(): Int = data.size
 
     fun getCount() = data.size
 }

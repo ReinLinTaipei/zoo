@@ -33,4 +33,5 @@ sealed class Data {
         val picUrl: String? = null
     ): Data()
 
+    data class NextPage(val position: Int): Data()
 }

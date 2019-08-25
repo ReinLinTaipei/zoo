@@ -8,6 +8,7 @@ import com.reinlin.data.service.db.ZooDatabase
 import com.reinlin.domain.model.Data
 import com.reinlin.domain.repository.ILocalRepository
 import com.reinlin.domain.repository.IRemoteRepository
+import com.reinlin.domain.usecase.GetBriefUseCase
 import com.reinlin.zoo.brief.BriefListFragment
 import com.reinlin.zoo.brief.BriefListManager
 import com.reinlin.zoo.brief.BriefListPresenter
@@ -32,6 +33,10 @@ class ZooInjector(application: Application) {
         LocalRepositoryImpl(database.exhibitDao(), database.plantDao())
     }
 
+    private val briefUsecase: GetBriefUseCase by lazy {
+        GetBriefUseCase(localRepository, remoteRepository)
+    }
+
     private val exhibitListManager: BriefListManager by lazy {
         BriefListManager()
     }
@@ -47,8 +52,7 @@ class ZooInjector(application: Application) {
     fun buildBriefPresenter(briefView: BriefListFragment): BriefListFragment =
         BriefListPresenter(
             DispatcherProvider,
-            remoteService = remoteRepository,
-            localService = localRepository,
+            userCase = briefUsecase,
             data = (localRepository as LocalRepositoryImpl).exhibitsFromDB,
             dataManager = exhibitListManager,
             view = briefView

@@ -1,72 +1,120 @@
 package com.reinlin.domain.usecase
 
-import com.reinlin.domain.model.Data
+import com.reinlin.domain.model.*
 import com.reinlin.domain.repository.ILocalRepository
 import com.reinlin.domain.repository.IRemoteRepository
 
-const val CACHE_LIMIT = 10
+const val CACHE_LIMIT = 30
+const val PAGE_COUNT = 10
 
 class GetBriefUseCase(
-    val localRepository: ILocalRepository,
-    val remoteRepository: IRemoteRepository
+    private val localRepository: ILocalRepository,
+    private val remoteRepository: IRemoteRepository
 ) {
     private val cachedList = arrayListOf<Data.Exhibit>()
-    private val pendingList = arrayListOf<Process.Pending>()
-    private var localProcess: Process = Process.Stop
-    private var lastId = 0
 
-    fun useCached(
-        position: Int,
-        notify: (Data.Exhibit) -> Unit,
-        queryLocal: (pending: Process.Pending) -> Unit
+    fun getCached(
+        position: Int
+    ): Pending {
+        return cachedList.run {
+            singleOrNull { it.position == position }
+                ?.let {
+                    val id = cachedList.indexOf(it)
+                    val count = cachedList.size - id
+                    Pending.Cached(cachedList.subList(id, if (count > PAGE_COUNT) PAGE_COUNT else count))
+                }
+                ?: let {
+                    when {
+                        it.isEmpty()                -> Pending.Forward(0, 0)
+                        position < first().position -> Pending.Back(position, first().id - 1)
+                        else                        -> Pending.Forward(position, last().id + 1)
+                    }
+                }
+        }
+    }
+
+    suspend fun queryLocal(
+        pending: Pending,
+        notify: (data: Notify) -> Unit
     ) {
-        cachedList.apply {
-                singleOrNull { it.position == position }
-                    ?.let(notify)
-                    ?: addPending(Process.Pending(position, ++lastId), queryLocal)
+        when (pending) {
+            is Pending.Back -> queryBack(1, pending, notify)
+            is Pending.Forward -> queryForward(pending, notify)
         }
     }
 
-    private fun addPending(pending: Process.Pending,
-                           queryLocal: (pending: Process.Pending) -> Unit) {
-        pendingList.add(pending)
-        if (localProcess == Process.Stop) {
-            localProcess = Process.Querying
-            consumePending(queryLocal)
+    private suspend fun queryBack(
+        count: Int,
+        pending: Pending.Back,
+        notify: (data: Notify) -> Unit
+    ) {
+        if (count > PAGE_COUNT || pending.position < 0 || pending.offset < 0) {
+            val backData = cachedList.subList(0, count - 1)
+            notify(Notify.Back(backData))
+            return
         }
+
+        val singleLocal = localRepository.getExhibit(pending.offset)
+        singleLocal?.let {
+            val data = it.copy(position = pending.position)
+            addCached(Cached.Back(data))
+        }
+
+        queryBack(
+            count + 1,
+            Pending.Back(
+                pending.position - 1,
+                pending.offset - 1
+            ),
+            notify
+        )
     }
 
-    private fun consumePending(queryLocal: (pending: Process.Pending) -> Unit) {
-        if (localProcess == Process.Querying) {
-            if (pendingList.isNotEmpty())
-                queryLocal(pendingList.removeAt(0))
+    private suspend fun queryForward(
+        pending: Pending.Forward,
+        notify: (data: Notify) -> Unit
+    ) {
+        localRepository.getExhibits(pending.offset, PAGE_COUNT).let { data ->
+            if (data.isNotEmpty()) {
+                var count = pending.position
+                data.map { addCached(Cached.Forward(it.copy(position = count++))) }
+                notify(Notify.Forward(data))
+            }
             else
-                localProcess = Process.Stop
+                fetchRemote(pending, notify)
         }
     }
 
-    suspend fun fetchLocal(
-        pending: Process.Pending,
-        notify: (Data.Exhibit) -> Unit,
-        queryLocal: (pending: Process.Pending) -> Unit
-    ) {
-//        localRepository.getExhibit(pending.id)?.let { data ->
-//            pendingList.remove(pending)
-//            addCached(data.copy(position = pending.position))
-//            notify(data)
-//        }
-
-        consumePending(queryLocal)
+    private suspend fun fetchRemote(pending: Pending.Forward, notify: (Notify) -> Unit) {
+        remoteRepository.getExhibits(pending.offset, PAGE_COUNT).let {
+            when(it) {
+                is Zoo.Exhibits -> {
+                    var count = pending.position
+                    it.exhibits.map { data ->
+                        addCached(Cached.Forward(data.copy(position = count++)))
+                        localRepository.insert(data)
+                    }
+                    notify(Notify.Forward(it.exhibits))
+                }
+                else -> Notify.Result(it)
+            }
+        }
     }
 
-    private fun addCached(data: Data.Exhibit) {
-        cachedList.add(data)
-        if (cachedList.size > CACHE_LIMIT) cachedList.removeAt(0)
+    private fun addCached(data: Cached) {
+        when(data) {
+            is Cached.Back    -> cachedList.add(0, data.data as Data.Exhibit)
+            is Cached.Forward -> cachedList.add(data.data as Data.Exhibit)
+        }
+        removeData(data)
     }
 
-    sealed class Process {
-        object Stop : Process()
-        object Querying : Process()
-        data class Pending(val position: Int, val id: Int) : Process()
+    private fun removeData(data: Cached) {
+        if (cachedList.size > CACHE_LIMIT)
+            when(data) {
+                is Cached.Back -> cachedList.last { cachedList.remove(it) }
+                is Cached.Forward -> cachedList.removeAt(0)
+            }
     }
+
 }

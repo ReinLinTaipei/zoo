@@ -3,6 +3,7 @@ package com.reinlin.zoo
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import com.reinlin.domain.model.Data
+import com.reinlin.domain.model.Notify
 import com.reinlin.domain.model.Zoo
 import com.reinlin.zoo.brief.BriefListManager
 import com.reinlin.zoo.detail.DetailListManager
@@ -15,7 +16,7 @@ interface IZooContract {
     }
 
     interface BriefView {
-        fun onFetchDone(result: Zoo)
+        fun notify(result: Notify)
     }
 
     interface DetailView {
