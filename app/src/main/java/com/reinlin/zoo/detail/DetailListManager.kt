@@ -5,7 +5,7 @@ import com.reinlin.domain.model.Data
 import com.reinlin.domain.model.Zoo
 import com.reinlin.zoo.common.*
 
-class DetailListManager : BaseManager<Data>() {
+class DetailListManager : BaseManager() {
 
     var exhibit: Data.Exhibit? = null
     var fromBack = false
@@ -39,18 +39,14 @@ class DetailListManager : BaseManager<Data>() {
         return lastCount
     }
 
-    fun update(updates: List<Data.Plant>, insert: Int.() -> Unit, notify: Int.() -> Unit): Int {
-        updates.forEachIndexed { index, update ->
-            compareItem(index, update,
+    fun update(updates: List<Data.Plant>, notify: Compare.() -> Unit) {
+        updates.map { update ->
+            compare(update,
                 data.filterIsInstance<Data.Plant>().
-                    singleOrNull { it.id == update.id }, { compare, target ->
-                    val old = compare as Data.Plant
-                    val refresh = target as Data.Plant
-                if (old.name.equals(refresh.name).not()) return@compareItem true
-                if (old.detail.equals(refresh.detail).not()) return@compareItem true
-                return@compareItem false
-            }, insert, notify)
+                    singleOrNull { it.id == update.id }, { old, refresh ->
+                    old.name.equals(refresh.name).not() ||
+                            old.detail.equals(refresh.detail).not()
+            }).notify()
         }
-        return getCount()
     }
 }

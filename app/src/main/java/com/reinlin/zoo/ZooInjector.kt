@@ -1,14 +1,14 @@
 package com.reinlin.zoo
 
 import android.app.Application
-import androidx.lifecycle.LiveData
-import com.reinlin.data.repository.LocalRepositoryImpl
+import com.reinlin.data.repository.LocalExhibitRepoImpl
+import com.reinlin.data.repository.LocalPlantRepoImp
 import com.reinlin.data.repository.RemoteRepositoryImpl
 import com.reinlin.data.service.db.ZooDatabase
 import com.reinlin.domain.model.Data
 import com.reinlin.domain.repository.ILocalRepository
 import com.reinlin.domain.repository.IRemoteRepository
-import com.reinlin.domain.usecase.GetBriefUseCase
+import com.reinlin.domain.usecase.GetDataUseCase
 import com.reinlin.zoo.brief.BriefListFragment
 import com.reinlin.zoo.brief.BriefListManager
 import com.reinlin.zoo.brief.BriefListPresenter
@@ -29,12 +29,16 @@ class ZooInjector(application: Application) {
         ZooDatabase.getDatabase(application.applicationContext)
     }
 
-    private val localRepository: ILocalRepository by lazy {
-        LocalRepositoryImpl(database.exhibitDao(), database.plantDao())
+    private val localExhibitRepo: ILocalRepository<Data.Exhibit> by lazy {
+        LocalExhibitRepoImpl(database.exhibitDao())
     }
 
-    private val briefUsecase: GetBriefUseCase by lazy {
-        GetBriefUseCase(localRepository, remoteRepository)
+    private val localPlantRepo: ILocalRepository<Data.Plant> by lazy {
+        LocalPlantRepoImp(database.plantDao())
+    }
+
+    private val getDataUseCase: GetDataUseCase by lazy {
+        GetDataUseCase(localExhibitRepo, localPlantRepo, remoteRepository)
     }
 
     private val exhibitListManager: BriefListManager by lazy {
@@ -52,8 +56,8 @@ class ZooInjector(application: Application) {
     fun buildBriefPresenter(briefView: BriefListFragment): BriefListFragment =
         BriefListPresenter(
             DispatcherProvider,
-            userCase = briefUsecase,
-            data = (localRepository as LocalRepositoryImpl).exhibitsFromDB,
+            useCase = getDataUseCase,
+            data = (localExhibitRepo as LocalExhibitRepoImpl).exhibitsFromDB,
             dataManager = exhibitListManager,
             view = briefView
         ).let {
@@ -64,9 +68,8 @@ class ZooInjector(application: Application) {
     fun buildDetailPresenter(detailView: DetailListFragment): DetailListFragment =
         DetailListPresenter(
             DispatcherProvider,
-            remoteService = remoteRepository,
-            localService = localRepository,
-            data = (localRepository as LocalRepositoryImpl).plantsFromDB,
+            useCase = getDataUseCase,
+            data = (localPlantRepo as LocalPlantRepoImp).plantsFromDB,
             dataManager = detailListManager,
             view = detailView
         ).let {

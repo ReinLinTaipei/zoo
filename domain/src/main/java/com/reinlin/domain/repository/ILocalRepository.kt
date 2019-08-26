@@ -1,18 +1,17 @@
 package com.reinlin.domain.repository
 
-import com.reinlin.domain.model.Data
 
-interface ILocalRepository {
 
-    suspend fun getExhibit(id: Int): Data.Exhibit?
+interface ILocalRepository<T> {
 
-    suspend fun getExhibits(startId: Int, count: Int = 10): List<Data.Exhibit>
+    suspend fun getData(id: Int): T?
 
-    suspend fun getPlants(startId: Int, count: Int = 10): List<Data.Plant>
+    suspend fun getData(startId: Int, count: Int): List<T>
 
-    suspend fun insert(data: Data)
+    suspend fun insert(data: T)
 
-    suspend fun deleteExhibits()
+    suspend fun insertAll(data: List<T>)
 
-    suspend fun deletePlants()
+    suspend fun deleteAll()
+
 }

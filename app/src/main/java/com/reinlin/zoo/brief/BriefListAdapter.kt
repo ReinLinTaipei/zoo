@@ -25,7 +25,9 @@ class BriefListAdapter(
                     parent,
                     false
                 )
-            )
+            ) {
+                listener.onItemClicked(dataManager.getData(it) as Data.Exhibit)
+            }
             else -> NextHolder(
                 LayoutInflater.from(parent.context).inflate(
                     R.layout.item_next_page,
@@ -33,18 +35,16 @@ class BriefListAdapter(
                     false
                 )
             ) {
-                listener.onItemClicked(Data.NextPage(it))
+                val offset: Int = (dataManager.getData(it-1) as Data.Exhibit).id
+                listener.onItemClicked(Data.NextPage(offset))
             }
         }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (listener.isAnimating().not())
-        when(getItemViewType(position)) {
-            R.layout.item_brief -> (holder as ViewHolder).bind(
-                dataManager.getData(position) as Data.Exhibit,
-                listener::onItemClicked
-            )
-        }
+            when (getItemViewType(position)) {
+                R.layout.item_brief -> (holder as ViewHolder).bind(dataManager.getData(position) as Data.Exhibit)
+            }
     }
 
     override fun getItemCount(): Int =
@@ -60,12 +60,18 @@ class BriefListAdapter(
 
     class ViewHolder(
         view: View,
-        private val avatar: ImageView = view.findViewById(R.id.brief_avatar),
-        private val titleTextView: TextView = view.findViewById(R.id.brief_title),
-        private val briefTextView: TextView = view.findViewById(R.id.brief_description)
+        click: (position: Int) -> Unit
     ) : RecyclerView.ViewHolder(view) {
 
-        fun bind(data: Data.Exhibit, click: (Data.Exhibit) -> Unit) {
+        private val avatar: ImageView = view.findViewById(R.id.brief_avatar)
+        private val titleTextView: TextView = view.findViewById(R.id.brief_title)
+        private val briefTextView: TextView = view.findViewById(R.id.brief_description)
+
+        init {
+            itemView.setOnClickListener { click(adapterPosition) }
+        }
+
+        fun bind(data: Data.Exhibit) {
             data.let {
                 it.picUrl?.let { url ->
                     Glide.with(itemView)
@@ -80,14 +86,13 @@ class BriefListAdapter(
                         if (info.length < BRIEF_INFO_LENGTH) info
                         else "${info.substring(0, BRIEF_INFO_LENGTH)}..."
                 }
-                itemView.setOnClickListener { click(data) }
             }
         }
     }
 
     class NextHolder(
         view: View, click: (position: Int) -> Unit
-    ): RecyclerView.ViewHolder(view) {
+    ) : RecyclerView.ViewHolder(view) {
 
         init {
             view.setOnClickListener {

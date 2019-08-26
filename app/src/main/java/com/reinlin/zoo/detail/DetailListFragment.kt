@@ -56,13 +56,12 @@ class DetailListFragment: Fragment(), IZooContract.DetailView, IZooContract.IAda
         })
         presenter.dataFromDB.observe(this, Observer {
             detail_swipe.isRefreshing = false
-            dataManager.update(it.map { db -> db as Data.Plant },
-                {
-                    adapter?.notifyItemInserted(this)
-                },
-                {
-                    adapter?.notifyItemChanged(this)
-                })
+            dataManager.update(it.map { db -> db as Data.Plant }) {
+                when(this) {
+                    is Compare.Insert -> adapter?.notifyItemInserted(this.position)
+                    is Compare.Update -> adapter?.notifyItemInserted(this.position)
+                }
+            }
         })
     }
 

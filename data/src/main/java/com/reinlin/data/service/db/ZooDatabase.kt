@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.reinlin.data.model.local.DbZoo
 
-@Database(entities = [DbZoo.Exhibit::class, DbZoo.Plant::class], version = 1, exportSchema = false)
+@Database(entities = [DbZoo.Exhibit::class, DbZoo.Plant::class], version = 2, exportSchema = false)
 abstract class ZooDatabase : RoomDatabase() {
 
     abstract fun exhibitDao(): ExhibitDao

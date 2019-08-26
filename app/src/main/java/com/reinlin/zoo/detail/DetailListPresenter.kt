@@ -8,6 +8,7 @@ import com.reinlin.domain.model.Data
 import com.reinlin.domain.model.Zoo
 import com.reinlin.domain.repository.ILocalRepository
 import com.reinlin.domain.repository.IRemoteRepository
+import com.reinlin.domain.usecase.GetDataUseCase
 import com.reinlin.zoo.IZooContract
 import com.reinlin.zoo.ZooViewEvent
 import com.reinlin.zoo.common.BasePresenter
@@ -19,8 +20,7 @@ import kotlin.coroutines.CoroutineContext
 
 class DetailListPresenter(
     dispatcher: DispatcherProvider,
-    private val remoteService: IRemoteRepository,
-    private val localService: ILocalRepository,
+    private val useCase: GetDataUseCase,
     private val data: LiveData<List<Data.Plant>>,
     private val dataManager: DetailListManager,
     private val view: IZooContract.DetailView
@@ -53,16 +53,7 @@ class DetailListPresenter(
 
     private fun fetchPlants(keyword: String?) = launch {
         if (TextUtils.isEmpty(keyword).not()) {
-            remoteService.getPlants(0, keyword!!).let { result ->
-                when (result) {
-                    is Zoo.Plants -> {
-                        result.plants.map {
-                            localService.insert(it)
-                        }
-                    }
-                    else -> view.onFetchDone(result)
-                }
-            }
+            useCase.fetchPlants(0, keyword!!, view::onFetchDone)
         } else
             view.onFetchDone(Zoo.NoData)
     }
