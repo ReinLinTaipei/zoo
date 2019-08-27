@@ -24,7 +24,7 @@ class BriefListFragment: Fragment(), IZooContract.BriefView, IZooContract.IAdapt
     private var mainListener: IZooContract.MainView? = null
     private val event = MutableLiveData<ZooViewEvent>()
     private val dataManager: BriefListManager by lazy { presenter.getDataManager() }
-    private val adapter: BriefListAdapter by lazy { brief_list.adapter as BriefListAdapter }
+    private val adapter: BriefListAdapter by lazy { brief_list.adapter  as BriefListAdapter }
 
     companion object {
         @JvmStatic
@@ -43,7 +43,6 @@ class BriefListFragment: Fragment(), IZooContract.BriefView, IZooContract.IAdapt
         })
         presenter.dataFromDB.observe(this, Observer { data ->
             Log.i(TAG, "observe exhibits from DB: ${data.size}")
-            brief_swipe.isRefreshing = false
             dataManager.update(data.map { it as Data.Exhibit }) {
                 when(this) {
                     is Compare.Update -> adapter.notifyItemChanged(this.position)
@@ -70,7 +69,6 @@ class BriefListFragment: Fragment(), IZooContract.BriefView, IZooContract.IAdapt
     }
 
     private fun nextPage(position: Int) {
-        brief_swipe.isRefreshing = true
         event.value = ZooViewEvent.FetchExhibits(position)
     }
 
@@ -86,7 +84,6 @@ class BriefListFragment: Fragment(), IZooContract.BriefView, IZooContract.IAdapt
 
     override fun notify(result: Zoo) {
         Log.i(TAG, "onFetchDone $result")
-        brief_swipe.isRefreshing = false
         when(result) {
             is Zoo.NoData    -> context?.toast(context!!.getString(R.string.no_data))
             is Zoo.Exception -> context?.toast(result.message)
