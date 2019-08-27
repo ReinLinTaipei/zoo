@@ -29,4 +29,7 @@ class GetDataUseCase(
             }
         }
     }
+
+    suspend fun deleteExhibits() =
+        localExhibitRepo.deleteAll()
 }

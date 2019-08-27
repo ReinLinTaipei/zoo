@@ -10,7 +10,7 @@ import com.reinlin.data.model.local.DbZoo
 @Dao
 interface ExhibitDao: BaseDao<DbZoo.Exhibit> {
 
-    @Query("SELECT * FROM table_exhibit ORDER BY id DESC")
+    @Query("SELECT * FROM table_exhibit ORDER BY id ASC")
     fun getData(): LiveData<List<DbZoo.Exhibit>>
 
     @Query("SELECT * FROM table_exhibit WHERE id = :id")
@@ -20,5 +20,5 @@ interface ExhibitDao: BaseDao<DbZoo.Exhibit> {
     suspend fun getExhibits(startId: Int, limit: Int = 10): List<DbZoo.Exhibit>
 
     @Query("DELETE FROM table_exhibit")
-    fun deleteAll()
+    suspend fun deleteAll()
 }

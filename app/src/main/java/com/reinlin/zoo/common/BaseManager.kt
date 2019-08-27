@@ -1,6 +1,7 @@
 package com.reinlin.zoo.common
 
 import com.reinlin.domain.model.Data
+import com.reinlin.zoo.model.Notify
 
 
 open class BaseManager {
@@ -8,31 +9,30 @@ open class BaseManager {
     protected val data: ArrayList<Data> = arrayListOf()
 
     protected fun <T : Data> compare(
-        update: T, origin: T?,
-        isDiff: (origin: T, update: T) -> Boolean
-    ): Compare =
-        origin?.let {
-            if (isDiff(origin, update)) {
-                val id = data.indexOf(origin)
+        update: T, old: T?,
+        isDiff: (old: T, update: T) -> Boolean
+    ): Notify =
+        old?.let {
+            if (isDiff(old, update)) {
+                val id = data.indexOf(old)
                 data[id] = update
-                Compare.Update(id)
+                Notify.Update(id)
             } else
-                Compare.Noting
+                Notify.Noting
         } ?: let {
             data.add(update)
-            Compare.Insert(data.size - 1)
+            Notify.Insert(data.size - 1)
         }
 
     fun getData(position: Int): Data? =
         if (position < data.size) data[position] else null
 
-    fun getOffset(): Int = data.filterIsInstance<Data.Exhibit>().last().id
-
     fun getCount() = data.size
+
+    fun clear() = data.clear()
+
+    fun addData(item: Data) {
+        data.add(item)
+    }
 }
 
-sealed class Compare {
-    data class Insert(val position: Int) : Compare()
-    data class Update(val position: Int) : Compare()
-    object Noting : Compare()
-}

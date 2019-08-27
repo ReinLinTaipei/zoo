@@ -2,8 +2,8 @@ package com.reinlin.zoo.detail
 
 import android.os.Bundle
 import com.reinlin.domain.model.Data
-import com.reinlin.domain.model.Zoo
 import com.reinlin.zoo.common.*
+import com.reinlin.zoo.model.Notify
 
 class DetailListManager : BaseManager() {
 
@@ -39,7 +39,7 @@ class DetailListManager : BaseManager() {
         return lastCount
     }
 
-    fun update(updates: List<Data.Plant>, notify: Compare.() -> Unit) {
+    fun update(updates: List<Data.Plant>, notify: Notify.() -> Unit) {
         updates.map { update ->
             compare(update,
                 data.filterIsInstance<Data.Plant>().

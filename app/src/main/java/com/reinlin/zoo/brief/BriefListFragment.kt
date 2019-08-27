@@ -16,9 +16,10 @@ import com.reinlin.domain.model.Zoo
 import com.reinlin.zoo.*
 import com.reinlin.zoo.common.*
 import com.reinlin.zoo.common.toast
+import com.reinlin.zoo.model.Notify
 import kotlinx.android.synthetic.main.fragment_brief_list.*
 
-class BriefListFragment: Fragment(), IZooContract.BriefView, IZooContract.IAdapter<Data> {
+class BriefListFragment: Fragment(), IZooContract.BriefView, IZooContract.IAdapter {
 
     lateinit var presenter: IZooContract.ViewPresenter<BriefListManager>
     private var mainListener: IZooContract.MainView? = null
@@ -42,15 +43,23 @@ class BriefListFragment: Fragment(), IZooContract.BriefView, IZooContract.IAdapt
             presenter.observe(it)
         })
         presenter.dataFromDB.observe(this, Observer { data ->
-            Log.i(TAG, "observe exhibits from DB: ${data.size}")
+
             dataManager.update(data.map { it as Data.Exhibit }) {
                 when(this) {
-                    is Compare.Update -> adapter.notifyItemChanged(this.position)
-                    is Compare.Insert -> adapter.notifyItemInserted(this.position)
+                    is Notify.Update  -> adapter.notifyItemChanged(position)
+                    is Notify.Insert  -> adapter.notifyItemInserted(position)
+                    is Notify.Remove  -> adapter.notifyItemRemoved(position)
+                    is Notify.Refresh -> adapter.refresh().also { brief_swipe.isRefreshing = false }
+                    is Notify.End     -> {
+                        brief_swipe.isRefreshing = false
+                        if (isAnimating().not())
+                            brief_list.layoutManager?.scrollToPosition(adapter.itemCount-1)
+                    }
                 }
             }
         })
     }
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_brief_list, container, false)
@@ -60,34 +69,42 @@ class BriefListFragment: Fragment(), IZooContract.BriefView, IZooContract.IAdapt
         super.onViewCreated(view, savedInstanceState)
 
         mainListener?.setToolbarTitle(getString(R.string.app_name))
+
         brief_list.apply {
             layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
             adapter = BriefListAdapter(dataManager, this@BriefListFragment)
         }
 
-        nextPage(0)
+        brief_swipe.setOnRefreshListener {
+            event.value = ZooViewEvent.DeleteExhibit
+        }
+
+        fetchData(0)
     }
 
-    private fun nextPage(position: Int) {
-        event.value = ZooViewEvent.FetchExhibits(position)
-    }
 
     override fun isAnimating(): Boolean =
         brief_list.isAnimating
 
-    override fun onItemClicked(data: Data) {
+
+    override fun <T> onItemClicked(data: T) {
         when(data) {
             is Data.Exhibit  -> mainListener?.nextPage(InjectEvent.Detail(data))
-            is Data.NextPage -> nextPage(data.offset)
+            is Data.NextPage -> fetchData(data.offset)
         }
     }
 
-    override fun notify(result: Zoo) {
-        Log.i(TAG, "onFetchDone $result")
-        when(result) {
+    private fun fetchData(offset: Int) {
+        brief_swipe.isRefreshing = true
+        event.value = ZooViewEvent.FetchExhibits(offset)
+    }
+
+    override fun notify(data: Zoo) {
+        Log.i(TAG, "notify $data")
+        brief_swipe.isRefreshing = false
+        when(data) {
             is Zoo.NoData    -> context?.toast(context!!.getString(R.string.no_data))
-            is Zoo.Exception -> context?.toast(result.message)
-            is Zoo.Exhibits-> dataManager.addData(result.exhibits, adapter::notifyItemRangeInserted)
+            is Zoo.Exception -> context?.toast(data.message)
         }
     }
 

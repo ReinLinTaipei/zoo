@@ -12,16 +12,16 @@ interface IZooContract {
     }
 
     interface BriefView {
-        fun notify(result: Zoo)
+        fun notify(data: Zoo)
     }
 
     interface DetailView {
         fun onFetchDone(result: Zoo)
     }
 
-    interface IAdapter<in T> {
+    interface IAdapter {
         fun isAnimating(): Boolean
-        fun onItemClicked(data: T)
+        fun<T> onItemClicked(data: T)
     }
 
     interface ViewPresenter<out T> {
@@ -35,6 +35,8 @@ interface IZooContract {
 sealed class ZooViewEvent {
     data class FetchExhibits(val offset: Int): ZooViewEvent()
     data class FetchPlants(val keyword: String?): ZooViewEvent()
+    object DeleteExhibit: ZooViewEvent()
+    object DeletePlants: ZooViewEvent()
 }
 
 sealed class InjectEvent {

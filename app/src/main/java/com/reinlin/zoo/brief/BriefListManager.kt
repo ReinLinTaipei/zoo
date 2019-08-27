@@ -1,30 +1,49 @@
 package com.reinlin.zoo.brief
 
+import android.util.Log
 import com.reinlin.domain.model.Data
-import com.reinlin.domain.usecase.PAGE_COUNT
 import com.reinlin.zoo.common.BaseManager
-import com.reinlin.zoo.common.Compare
+import com.reinlin.zoo.common.TAG
+import com.reinlin.zoo.model.Notify
 
 class BriefListManager : BaseManager() {
 
-    fun update(updates: List<Data.Exhibit>, notify: Compare.() -> Unit) {
-        updates.map { update ->
+    fun update(dbData: List<Data.Exhibit>, notify: Notify.() -> Unit) {
+
+        Log.i(TAG, "update exhibits from DB: ${dbData.size}")
+        if (dbData.isEmpty()) {
+            Notify.Refresh.notify()
+            return
+        }
+
+        removeNextItem(notify)
+
+        dbData.map { update ->
             data.filterIsInstance<Data.Exhibit>()
                 .singleOrNull { it.id == update.id }
-                .let { origin ->
-                    compare(update, origin) { ori, upd ->
+                .let { old ->
+                    compare(update, old) { ori, upd ->
                         ori.name.equals(upd.name).not() ||
                                 ori.info.equals(upd.info)
                     }.notify()
                 }
+        }.also {
+            if (data.isNotEmpty()) {
+                val offset = (data.last() as Data.Exhibit).id
+                data.add(Data.NextPage(offset + 1))
+                Notify.Insert(data.size - 1).notify()
+            }
+            Notify.End.notify()
         }
     }
 
-    fun addData(result: List<Data.Exhibit>, notify: (startId: Int, count: Int) -> Unit) {
-        val lastSize = data.size
-        if (result.size == PAGE_COUNT)
-            data.add(Data.NextPage(data.size))
-        notify(lastSize - 1, data.size - lastSize)
+    private fun removeNextItem(notify: Notify.() -> Unit) {
+        data.singleOrNull { it is Data.NextPage }
+            ?.let {
+                val id = data.indexOf(it)
+                data.remove(it)
+                Notify.Remove(id).notify()
+            }
     }
 }
 

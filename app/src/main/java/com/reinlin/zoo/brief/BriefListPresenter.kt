@@ -40,13 +40,14 @@ class BriefListPresenter(
     override fun getDataManager(): BriefListManager = dataManager
 
     override fun observe(event: ZooViewEvent) {
+        Log.i(TAG, "event action: $event")
         when (event) {
-            is ZooViewEvent.FetchExhibits -> fetchData(event.offset)
+            is ZooViewEvent.FetchExhibits -> launch {
+                useCase.fetchExhibits(event.offset, PAGE_COUNT, view::notify)
+            }
+            is ZooViewEvent.DeleteExhibit -> launch {
+                useCase.deleteExhibits()
+            }
         }
-    }
-
-    private fun fetchData(offset: Int) = launch {
-        Log.i(TAG, "fetch start: $offset")
-        useCase.fetchExhibits(offset, PAGE_COUNT, view::notify)
     }
 }

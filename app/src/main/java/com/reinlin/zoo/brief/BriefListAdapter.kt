@@ -1,7 +1,7 @@
 package com.reinlin.zoo.brief
 
+import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
@@ -11,39 +11,29 @@ import com.reinlin.domain.model.Data
 import com.reinlin.zoo.IZooContract
 import com.reinlin.zoo.R
 import com.reinlin.zoo.common.BRIEF_INFO_LENGTH
+import com.reinlin.zoo.common.TAG
 
 class BriefListAdapter(
     private val dataManager: BriefListManager,
-    private val listener: IZooContract.IAdapter<Data>
+    private val listener: IZooContract.IAdapter
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
         when (viewType) {
-            R.layout.item_brief -> ViewHolder(
-                LayoutInflater.from(parent.context).inflate(
-                    R.layout.item_brief,
-                    parent,
-                    false
-                )
-            ) {
+            R.layout.item_brief -> BriefHolder(parent) {
                 listener.onItemClicked(dataManager.getData(it) as Data.Exhibit)
             }
-            else -> NextHolder(
-                LayoutInflater.from(parent.context).inflate(
-                    R.layout.item_next_page,
-                    parent,
-                    false
-                )
-            ) {
-                val offset: Int = (dataManager.getData(it-1) as Data.Exhibit).id
-                listener.onItemClicked(Data.NextPage(offset))
+            else -> NextHolder(parent) {
+                listener.onItemClicked(dataManager.getData(it))
             }
         }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (listener.isAnimating().not())
-            when (getItemViewType(position)) {
-                R.layout.item_brief -> (holder as ViewHolder).bind(dataManager.getData(position) as Data.Exhibit)
+            when(position) {
+                in 0 until itemCount -> when (getItemViewType(position)) {
+                    R.layout.item_brief -> (holder as BriefHolder).bind(dataManager.getData(position) as Data.Exhibit)
+                }
             }
     }
 
@@ -58,20 +48,37 @@ class BriefListAdapter(
         }
     }
 
-    class ViewHolder(
-        view: View,
-        click: (position: Int) -> Unit
-    ) : RecyclerView.ViewHolder(view) {
+    fun refresh() {
+        dataManager.apply {
+            val count = getCount()
+            if (count > 0) {
+                clear()
+                notifyItemRangeRemoved(0, count)
+                addData(Data.NextPage(0))
+                notifyItemInserted(getCount())
+            }
+        }
+    }
 
-        private val avatar: ImageView = view.findViewById(R.id.brief_avatar)
-        private val titleTextView: TextView = view.findViewById(R.id.brief_title)
-        private val briefTextView: TextView = view.findViewById(R.id.brief_description)
+    class BriefHolder(
+        parent: ViewGroup,
+        click: (position: Int) -> Unit
+    ) : RecyclerView.ViewHolder(LayoutInflater.from(parent.context).inflate(
+        R.layout.item_brief,
+        parent,
+        false
+    )) {
+
+        private val avatar: ImageView       by lazy { itemView.findViewById<ImageView>(R.id.brief_avatar) }
+        private val titleTextView: TextView by lazy { itemView.findViewById<TextView>(R.id.brief_title) }
+        private val briefTextView: TextView by lazy { itemView.findViewById<TextView>(R.id.brief_description) }
 
         init {
             itemView.setOnClickListener { click(adapterPosition) }
         }
 
         fun bind(data: Data.Exhibit) {
+            Log.i(TAG, "bind ($adapterPosition)(id:${data.id})${data.name}")
             data.let {
                 it.picUrl?.let { url ->
                     Glide.with(itemView)
@@ -80,7 +87,7 @@ class BriefListAdapter(
                         .placeholder(android.R.drawable.ic_dialog_info)
                         .into(avatar)
                 }
-                it.name?.let { name -> titleTextView.text = name }
+                it.name?.let { name -> titleTextView.text = itemView.context.getString(R.string.brief_title, it.id.toString(), name) }
                 it.info?.let { info ->
                     briefTextView.text =
                         if (info.length < BRIEF_INFO_LENGTH) info
@@ -91,13 +98,14 @@ class BriefListAdapter(
     }
 
     class NextHolder(
-        view: View, click: (position: Int) -> Unit
-    ) : RecyclerView.ViewHolder(view) {
-
+        parent: ViewGroup, val click: (position: Int) -> Unit
+    ) : RecyclerView.ViewHolder(LayoutInflater.from(parent.context).inflate(
+        R.layout.item_next_page,
+        parent,
+        false
+    )) {
         init {
-            view.setOnClickListener {
-                click(adapterPosition)
-            }
+            itemView.setOnClickListener { click(adapterPosition) }
         }
     }
 }
