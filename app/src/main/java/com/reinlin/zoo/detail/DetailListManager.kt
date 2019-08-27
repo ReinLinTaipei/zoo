@@ -1,6 +1,7 @@
 package com.reinlin.zoo.detail
 
 import android.os.Bundle
+import android.util.Log
 import com.reinlin.domain.model.Data
 import com.reinlin.zoo.common.*
 import com.reinlin.zoo.model.Notify
@@ -39,14 +40,21 @@ class DetailListManager : BaseManager() {
         return lastCount
     }
 
-    fun update(updates: List<Data.Plant>, notify: Notify.() -> Unit) {
-        updates.map { update ->
+    fun update(dbData: List<Data.Plant>, notify: Notify.() -> Unit) {
+        Log.i(TAG, "update plants ${dbData.size}")
+
+        if (dbData.isEmpty()) {
+            Notify.Refresh(refresh()).notify()
+            return
+        }
+
+        dbData.map { update ->
             compare(update,
-                data.filterIsInstance<Data.Plant>().
-                    singleOrNull { it.id == update.id }, { old, refresh ->
+                data.filterIsInstance<Data.Plant>().singleOrNull { it.id == update.id },
+                { old, refresh ->
                     old.name.equals(refresh.name).not() ||
                             old.detail.equals(refresh.detail).not()
-            }).notify()
+                }).notify()
         }
     }
 }

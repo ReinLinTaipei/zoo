@@ -5,7 +5,6 @@ import com.reinlin.domain.repository.ILocalRepository
 import com.reinlin.domain.repository.IRemoteRepository
 
 const val PAGE_COUNT = 10
-
 class GetDataUseCase(
     private val localExhibitRepo: ILocalRepository<Data.Exhibit>,
     private val localPlantRepo: ILocalRepository<Data.Plant>,
@@ -32,4 +31,9 @@ class GetDataUseCase(
 
     suspend fun deleteExhibits() =
         localExhibitRepo.deleteAll()
+
+    suspend fun deletePlants() {
+        localPlantRepo.deleteAll()
+    }
 }
+

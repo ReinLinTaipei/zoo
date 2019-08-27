@@ -2,6 +2,7 @@ package com.reinlin.zoo.detail
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -55,8 +56,10 @@ class DetailListFragment: Fragment(), IZooContract.DetailView, IZooContract.IAda
             detail_swipe.isRefreshing = false
             dataManager.update(it.map { db -> db as Data.Plant }) {
                 when(this) {
-                    is Notify.Insert -> adapter?.notifyItemInserted(this.position)
-                    is Notify.Update -> adapter?.notifyItemInserted(this.position)
+                    is Notify.Insert  -> adapter?.notifyItemInserted(this.position)
+                    is Notify.Update  -> adapter?.notifyItemInserted(this.position)
+                    is Notify.Refresh -> adapter?.notifyItemRangeRemoved(1, lastCount-1)
+                        .also { if (isAnimating().not()) event.value = ZooViewEvent.FetchPlants(dataManager.getKeyword()) }
                 }
             }
         })
@@ -77,11 +80,7 @@ class DetailListFragment: Fragment(), IZooContract.DetailView, IZooContract.IAda
         }
 
         detail_swipe.setOnRefreshListener {
-            dataManager.apply {
-                    val count = dataManager.refresh()
-                    adapter?.notifyItemRangeRemoved(1, count - 1)
-                    if (isAnimating().not()) event.value = ZooViewEvent.FetchPlants(getKeyword())
-                }
+            if (isAnimating().not()) event.value = ZooViewEvent.DeletePlants
         }
 
         if (dataManager.fromBack.not()) {
@@ -91,10 +90,11 @@ class DetailListFragment: Fragment(), IZooContract.DetailView, IZooContract.IAda
     }
 
     override fun onFetchDone(result: Zoo) {
+        Log.i(TAG, "on fetch done: $result")
         detail_swipe.isRefreshing = false
         when(result) {
             is Zoo.NoData -> {}
-            is Zoo.Exception -> { context?.toast(result.message)}
+            is Zoo.Exception  -> { context?.toast(result.message)}
         }
     }
 

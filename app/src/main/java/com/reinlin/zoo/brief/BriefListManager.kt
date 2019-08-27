@@ -12,7 +12,7 @@ class BriefListManager : BaseManager() {
 
         Log.i(TAG, "update exhibits from DB: ${dbData.size}")
         if (dbData.isEmpty()) {
-            Notify.Refresh.notify()
+            Notify.Refresh(data.size).notify()
             return
         }
 

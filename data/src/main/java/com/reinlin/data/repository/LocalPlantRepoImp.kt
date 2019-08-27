@@ -8,7 +8,7 @@ import com.reinlin.data.service.db.PlantDao
 import com.reinlin.domain.model.Data
 import com.reinlin.domain.repository.ILocalRepository
 
-class LocalPlantRepoImp(val dao: PlantDao) : ILocalRepository<Data.Plant> {
+class LocalPlantRepoImp(private val dao: PlantDao) : ILocalRepository<Data.Plant> {
 
     val plantsFromDB: LiveData<List<Data.Plant>> = Transformations.map(dao.getData()) {
         it.map { plant -> plant.toData }

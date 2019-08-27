@@ -21,10 +21,14 @@ class BriefListAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
         when (viewType) {
             R.layout.item_brief -> BriefHolder(parent) {
-                listener.onItemClicked(dataManager.getData(it) as Data.Exhibit)
+                when(it) {
+                    in 0 until itemCount -> listener.onItemClicked(dataManager.getData(it) as Data.Exhibit)
+                }
             }
             else -> NextHolder(parent) {
-                listener.onItemClicked(dataManager.getData(it))
+                when(it) {
+                    in 0 until itemCount -> listener.onItemClicked(dataManager.getData(it))
+                }
             }
         }
 

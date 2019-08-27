@@ -1,10 +1,7 @@
 package com.reinlin.data.service.db
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.reinlin.data.model.local.DbZoo
 
 @Dao
@@ -22,5 +19,11 @@ interface PlantDao: BaseDao<DbZoo.Plant> {
 
 
     @Query("DELETE FROM table_plant")
-    fun deleteAll()
+    suspend fun deleteAll()
+
+    @Transaction
+    suspend fun updateData(data: List<DbZoo.Plant>) {
+        deleteAll()
+        insertAll(data)
+    }
 }

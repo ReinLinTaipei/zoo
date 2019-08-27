@@ -5,5 +5,6 @@ sealed class Zoo {
     data class Plants(val offset: Int, val plants: List<Data.Plant>): Zoo()
     data class Exception(val message: String): Zoo()
     object NoData: Zoo()
+    object DeleteDone: Zoo()
 }
 
