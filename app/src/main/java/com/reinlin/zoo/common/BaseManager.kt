@@ -1,6 +1,7 @@
 package com.reinlin.zoo.common
 
 import com.reinlin.domain.model.Data
+import com.reinlin.zoo.model.Notify
 
 
 open class BaseManager {
@@ -10,17 +11,17 @@ open class BaseManager {
     protected fun <T : Data> compare(
         update: T, origin: T?,
         isDiff: (origin: T, update: T) -> Boolean
-    ): Compare =
+    ): Notify =
         origin?.let {
             if (isDiff(origin, update)) {
                 val id = data.indexOf(origin)
                 data[id] = update
-                Compare.Update(id)
+                Notify.Update(id)
             } else
-                Compare.Noting
+                Notify.Noting
         } ?: let {
             data.add(update)
-            Compare.Insert(data.size - 1)
+            Notify.Insert(data.size - 1)
         }
 
     fun getData(position: Int): Data? =
@@ -31,8 +32,3 @@ open class BaseManager {
     fun getCount() = data.size
 }
 
-sealed class Compare {
-    data class Insert(val position: Int) : Compare()
-    data class Update(val position: Int) : Compare()
-    object Noting : Compare()
-}

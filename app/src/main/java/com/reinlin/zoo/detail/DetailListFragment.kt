@@ -2,7 +2,6 @@ package com.reinlin.zoo.detail
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,10 +15,8 @@ import com.reinlin.domain.model.Zoo
 import com.reinlin.zoo.*
 import com.reinlin.zoo.common.*
 import com.reinlin.zoo.common.toast
-import com.reinlin.zoo.plant.PlantDetailFragment
-import kotlinx.android.synthetic.main.activity_main.*
+import com.reinlin.zoo.model.Notify
 import kotlinx.android.synthetic.main.fragment_detail_list.*
-import java.util.logging.Logger
 
 class DetailListFragment: Fragment(), IZooContract.DetailView, IZooContract.IAdapter<Data> {
 
@@ -58,8 +55,8 @@ class DetailListFragment: Fragment(), IZooContract.DetailView, IZooContract.IAda
             detail_swipe.isRefreshing = false
             dataManager.update(it.map { db -> db as Data.Plant }) {
                 when(this) {
-                    is Compare.Insert -> adapter?.notifyItemInserted(this.position)
-                    is Compare.Update -> adapter?.notifyItemInserted(this.position)
+                    is Notify.Insert -> adapter?.notifyItemInserted(this.position)
+                    is Notify.Update -> adapter?.notifyItemInserted(this.position)
                 }
             }
         })

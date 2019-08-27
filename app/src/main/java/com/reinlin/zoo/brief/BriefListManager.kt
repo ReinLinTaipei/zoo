@@ -3,11 +3,16 @@ package com.reinlin.zoo.brief
 import com.reinlin.domain.model.Data
 import com.reinlin.domain.usecase.PAGE_COUNT
 import com.reinlin.zoo.common.BaseManager
-import com.reinlin.zoo.common.Compare
+import com.reinlin.zoo.model.Notify
 
 class BriefListManager : BaseManager() {
 
-    fun update(updates: List<Data.Exhibit>, notify: Compare.() -> Unit) {
+    fun update(updates: List<Data.Exhibit>, notify: Notify.() -> Unit) {
+        if (data.isNotEmpty())
+            if (data.last() is Data.NextPage)
+                data.removeAt(data.size - 1).let {
+                    Notify.Remove(data.size).notify()
+                }
         updates.map { update ->
             data.filterIsInstance<Data.Exhibit>()
                 .singleOrNull { it.id == update.id }
@@ -17,8 +22,12 @@ class BriefListManager : BaseManager() {
                                 ori.info.equals(upd.info)
                     }.notify()
                 }
+        }.also {
+            data.add(Data.NextPage(data.size))
+            Notify.Insert(data.size - 1)
         }
     }
+
 
     fun addData(result: List<Data.Exhibit>, notify: (startId: Int, count: Int) -> Unit) {
         val lastSize = data.size

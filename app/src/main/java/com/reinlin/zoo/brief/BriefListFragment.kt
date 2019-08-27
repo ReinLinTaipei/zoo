@@ -16,6 +16,7 @@ import com.reinlin.domain.model.Zoo
 import com.reinlin.zoo.*
 import com.reinlin.zoo.common.*
 import com.reinlin.zoo.common.toast
+import com.reinlin.zoo.model.Notify
 import kotlinx.android.synthetic.main.fragment_brief_list.*
 
 class BriefListFragment: Fragment(), IZooContract.BriefView, IZooContract.IAdapter<Data> {
@@ -46,8 +47,9 @@ class BriefListFragment: Fragment(), IZooContract.BriefView, IZooContract.IAdapt
             brief_swipe.isRefreshing = false
             dataManager.update(data.map { it as Data.Exhibit }) {
                 when(this) {
-                    is Compare.Update -> adapter.notifyItemChanged(this.position)
-                    is Compare.Insert -> adapter.notifyItemInserted(this.position)
+                    is Notify.Update -> adapter.notifyItemChanged(this.position)
+                    is Notify.Insert -> adapter.notifyItemInserted(this.position)
+                    is Notify.Remove -> adapter.notifyItemRemoved(this.position)
                 }
             }
         })

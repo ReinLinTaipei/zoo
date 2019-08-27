@@ -35,7 +35,10 @@ class BriefListAdapter(
                     false
                 )
             ) {
-                val offset: Int = (dataManager.getData(it-1) as Data.Exhibit).id
+                val offset: Int =
+                    if (it >= 1)
+                        (dataManager.getData(it - 1) as Data.Exhibit).id
+                    else 0
                 listener.onItemClicked(Data.NextPage(offset))
             }
         }
