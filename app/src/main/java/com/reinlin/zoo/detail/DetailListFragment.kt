@@ -55,6 +55,7 @@ class DetailListFragment : Fragment(), IZooContract.PageView {
             presenter.observe(it)
         })
         presenter.dataFromDB.observe(this, Observer {
+
             dataManager.update(it.map { db -> db as Data.Plant }) {
                 when (this) {
                     is Notify.Insert -> adapter?.notifyItemInserted(this.position)
@@ -93,14 +94,17 @@ class DetailListFragment : Fragment(), IZooContract.PageView {
         }
 
         detail_swipe.setOnRefreshListener {
-            if (isAnimating().not()) event.value = ZooViewEvent.DeletePlants
+            refresh()
         }
 
-        if (dataManager.fromBack.not()) fetchPlants()
+        refresh()
+    }
+
+    private fun refresh() {
+        if (isAnimating().not()) event.value = ZooViewEvent.RefreshPlants
     }
 
     override fun notify(data: Zoo) {
-        Log.i(TAG, "on fetch done: $data")
         detail_swipe.isRefreshing = false
         when (data) {
             is Zoo.NoData -> context?.toast(getString(R.string.no_data))

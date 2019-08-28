@@ -26,6 +26,7 @@ class BriefListPresenter(
     IZooContract.ViewPresenter<BriefListManager> {
 
     init {
+        Log.i(TAG, "brief presenter init")
         job = Job()
     }
 
@@ -40,14 +41,9 @@ class BriefListPresenter(
     override fun getDataManager(): BriefListManager = dataManager
 
     override fun observe(event: ZooViewEvent) {
-        Log.i(TAG, "event action: $event")
         when (event) {
-            is ZooViewEvent.FetchExhibits -> launch {
-                useCase.fetchExhibits(event.offset, PAGE_COUNT, view::notify)
-            }
-            is ZooViewEvent.DeleteExhibit -> launch {
-                useCase.deleteExhibits()
-            }
+            is ZooViewEvent.FetchExhibits -> launch { useCase.fetchExhibits(event.offset, PAGE_COUNT, view::notify) }
+            is ZooViewEvent.RefreshExhibit -> launch { useCase.deleteExhibits() }
         }
     }
 }

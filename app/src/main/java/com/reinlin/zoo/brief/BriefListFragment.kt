@@ -43,6 +43,7 @@ class BriefListFragment: Fragment(), IZooContract.PageView {
             presenter.observe(it)
         })
         presenter.dataFromDB.observe(this, Observer { data ->
+            Log.i(TAG, "update db (${data.size})$data")
             if (data.isEmpty())
                 dataManager.refresh { adapter.notifyItemRangeRemoved(0, this.lastCount).also { fetchData(0) } }
             else
@@ -71,17 +72,15 @@ class BriefListFragment: Fragment(), IZooContract.PageView {
         super.onViewCreated(view, savedInstanceState)
 
         mainListener?.setToolbarTitle(getString(R.string.app_name))
-
         brief_list.apply {
             layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
             adapter = BriefListAdapter(dataManager, this@BriefListFragment)
         }
 
         brief_swipe.setOnRefreshListener {
-            event.value = ZooViewEvent.DeleteExhibit
+            Log.i(TAG, "delete all")
+            event.value = ZooViewEvent.RefreshExhibit
         }
-
-        fetchData(0)
     }
 
 
@@ -97,6 +96,7 @@ class BriefListFragment: Fragment(), IZooContract.PageView {
     }
 
     private fun fetchData(offset: Int) {
+        Log.i(TAG, "fetchData: $offset")
         brief_swipe.isRefreshing = true
         event.value = ZooViewEvent.FetchExhibits(offset)
     }

@@ -4,11 +4,8 @@ import android.text.TextUtils
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
-import androidx.lifecycle.liveData
 import com.reinlin.domain.model.Data
 import com.reinlin.domain.model.Zoo
-import com.reinlin.domain.repository.ILocalRepository
-import com.reinlin.domain.repository.IRemoteRepository
 import com.reinlin.domain.usecase.GetDataUseCase
 import com.reinlin.zoo.IZooContract
 import com.reinlin.zoo.ZooViewEvent
@@ -50,7 +47,7 @@ class DetailListPresenter(
     override fun observe(event: ZooViewEvent) {
         when (event) {
             is ZooViewEvent.FetchPlants  -> fetchPlants(event.keyword)
-            is ZooViewEvent.DeletePlants -> launch { useCase.deletePlants() }
+            is ZooViewEvent.RefreshPlants -> launch { useCase.deletePlants() }
         }
     }
 

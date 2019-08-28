@@ -70,7 +70,6 @@ class BriefListAdapter(
         }
 
         fun bind(data: Data.Exhibit) {
-            Log.i(TAG, "bind ($adapterPosition)(id:${data.id})${data.name}")
             data.let {
                 it.picUrl?.let { url ->
                     Glide.with(itemView)

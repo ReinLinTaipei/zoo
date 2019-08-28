@@ -28,8 +28,8 @@ interface IZooContract {
 sealed class ZooViewEvent {
     data class FetchExhibits(val offset: Int): ZooViewEvent()
     data class FetchPlants(val keyword: String?): ZooViewEvent()
-    object DeleteExhibit: ZooViewEvent()
-    object DeletePlants: ZooViewEvent()
+    object RefreshExhibit: ZooViewEvent()
+    object RefreshPlants: ZooViewEvent()
 }
 
 sealed class InjectEvent {

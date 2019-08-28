@@ -10,8 +10,6 @@ class BriefListManager : BaseManager() {
 
     fun update(dbData: List<Data.Exhibit>, notify: Notify.() -> Unit) {
 
-        Log.i(TAG, "update exhibits from DB: ${dbData.size}")
-
         removeNextItem(notify)
 
         dbData.map { update ->
