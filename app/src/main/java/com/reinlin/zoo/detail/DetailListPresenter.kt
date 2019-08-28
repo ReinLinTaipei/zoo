@@ -25,7 +25,7 @@ class DetailListPresenter(
     private val useCase: GetDataUseCase,
     private val data: LiveData<List<Data.Plant>>,
     private val dataManager: DetailListManager,
-    private val view: IZooContract.DetailView
+    private val view: IZooContract.PageView
 ) :
     BasePresenter(dispatcher),
     CoroutineScope,
@@ -57,8 +57,8 @@ class DetailListPresenter(
     private fun fetchPlants(keyword: String?) = launch {
         Log.i(TAG, "fetch plants: $keyword")
         if (TextUtils.isEmpty(keyword).not()) {
-            useCase.fetchPlants(0, keyword!!, view::onFetchDone)
+            useCase.fetchPlants(0, keyword!!, view::notify)
         } else
-            view.onFetchDone(Zoo.NoData)
+            view.notify(Zoo.NoData)
     }
 }

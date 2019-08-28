@@ -19,7 +19,7 @@ import com.reinlin.zoo.common.toast
 import com.reinlin.zoo.model.Notify
 import kotlinx.android.synthetic.main.fragment_brief_list.*
 
-class BriefListFragment: Fragment(), IZooContract.BriefView, IZooContract.IAdapter {
+class BriefListFragment: Fragment(), IZooContract.PageView {
 
     lateinit var presenter: IZooContract.ViewPresenter<BriefListManager>
     private var mainListener: IZooContract.MainView? = null
@@ -43,23 +43,25 @@ class BriefListFragment: Fragment(), IZooContract.BriefView, IZooContract.IAdapt
             presenter.observe(it)
         })
         presenter.dataFromDB.observe(this, Observer { data ->
-
-            dataManager.update(data.map { it as Data.Exhibit }) {
-                when(this) {
-                    is Notify.Update  -> adapter.notifyItemChanged(position)
-                    is Notify.Insert  -> adapter.notifyItemInserted(position)
-                    is Notify.Remove  -> adapter.notifyItemRemoved(position)
-                    is Notify.Refresh -> adapter.refresh().also { brief_swipe.isRefreshing = false }
-                    is Notify.End     -> {
-                        brief_swipe.isRefreshing = false
-                        if (isAnimating().not())
-                            brief_list.layoutManager?.scrollToPosition(adapter.itemCount-1)
+            if (data.isEmpty())
+                dataManager.refresh { adapter.notifyItemRangeRemoved(0, this.lastCount).also { fetchData(0) } }
+            else
+                dataManager.update(data.map { it as Data.Exhibit }) {
+                    when(this) {
+                        is Notify.Update  -> adapter.notifyItemChanged(position)
+                        is Notify.Insert  -> adapter.notifyItemInserted(position)
+                        is Notify.Remove  -> adapter.notifyItemRemoved(position)
+                        is Notify.End     -> scrollToPosition()
                     }
                 }
-            }
         })
     }
 
+    private fun scrollToPosition() {
+        brief_swipe.isRefreshing = false
+        if (isAnimating().not())
+            brief_list.layoutManager?.scrollToPosition(adapter.itemCount-1)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_brief_list, container, false)

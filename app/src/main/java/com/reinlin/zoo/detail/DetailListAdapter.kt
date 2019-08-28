@@ -13,7 +13,7 @@ import com.reinlin.zoo.R
 
 class DetailListAdapter(
     private val dataManager: DetailListManager,
-    private val listener: IZooContract.IAdapter): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    private val listener: IZooContract.PageView): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when(viewType) {

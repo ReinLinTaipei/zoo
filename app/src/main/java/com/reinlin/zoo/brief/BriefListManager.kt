@@ -11,10 +11,6 @@ class BriefListManager : BaseManager() {
     fun update(dbData: List<Data.Exhibit>, notify: Notify.() -> Unit) {
 
         Log.i(TAG, "update exhibits from DB: ${dbData.size}")
-        if (dbData.isEmpty()) {
-            Notify.Refresh(data.size).notify()
-            return
-        }
 
         removeNextItem(notify)
 
@@ -44,6 +40,12 @@ class BriefListManager : BaseManager() {
                 data.remove(it)
                 Notify.Remove(id).notify()
             }
+    }
+
+    fun refresh(notify: Notify.Refresh.() -> Unit) {
+        val lastCount = getCount()
+        clear()
+        Notify.Refresh(lastCount).notify()
     }
 }
 

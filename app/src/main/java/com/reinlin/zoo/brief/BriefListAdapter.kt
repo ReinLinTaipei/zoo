@@ -15,7 +15,7 @@ import com.reinlin.zoo.common.TAG
 
 class BriefListAdapter(
     private val dataManager: BriefListManager,
-    private val listener: IZooContract.IAdapter
+    private val listener: IZooContract.PageView
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
@@ -49,18 +49,6 @@ class BriefListAdapter(
             is Data.Exhibit -> R.layout.item_brief
             is Data.NextPage -> R.layout.item_next_page
             else -> super.getItemViewType(position)
-        }
-    }
-
-    fun refresh() {
-        dataManager.apply {
-            val count = getCount()
-            if (count > 0) {
-                clear()
-                notifyItemRangeRemoved(0, count)
-                addData(Data.NextPage(0))
-                notifyItemInserted(getCount())
-            }
         }
     }
 

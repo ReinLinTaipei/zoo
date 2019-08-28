@@ -11,15 +11,8 @@ interface IZooContract {
         fun setToolbarTitle(title: String?)
     }
 
-    interface BriefView {
+    interface PageView {
         fun notify(data: Zoo)
-    }
-
-    interface DetailView {
-        fun onFetchDone(result: Zoo)
-    }
-
-    interface IAdapter {
         fun isAnimating(): Boolean
         fun<T> onItemClicked(data: T)
     }

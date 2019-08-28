@@ -8,7 +8,7 @@ import com.reinlin.zoo.model.Notify
 
 class DetailListManager : BaseManager() {
 
-    var exhibit: Data.Exhibit? = null
+    private var exhibit: Data.Exhibit? = null
     var fromBack = false
 
     fun getKeyword(): String? {
@@ -32,7 +32,7 @@ class DetailListManager : BaseManager() {
         }
     }
 
-    fun refresh(): Int {
+    private fun refresh(): Int {
         fromBack = false
         val lastCount = data.size
         for (i in data.size - 1 downTo 1)
@@ -41,8 +41,6 @@ class DetailListManager : BaseManager() {
     }
 
     fun update(dbData: List<Data.Plant>, notify: Notify.() -> Unit) {
-        Log.i(TAG, "update plants ${dbData.size}")
-
         if (dbData.isEmpty()) {
             Notify.Refresh(refresh()).notify()
             return
@@ -55,6 +53,8 @@ class DetailListManager : BaseManager() {
                     old.name.equals(refresh.name).not() ||
                             old.detail.equals(refresh.detail).not()
                 }).notify()
+        }.also {
+            Notify.End.notify()
         }
     }
 }

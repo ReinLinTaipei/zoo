@@ -19,7 +19,7 @@ class BriefListPresenter(
     private val useCase: GetDataUseCase,
     data: LiveData<List<Data.Exhibit>>,
     private val dataManager: BriefListManager,
-    private val view: IZooContract.BriefView
+    private val view: IZooContract.PageView
 ) :
     BasePresenter(dispatcher),
     CoroutineScope,
