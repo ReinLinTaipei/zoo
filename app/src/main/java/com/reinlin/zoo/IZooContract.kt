@@ -21,7 +21,8 @@ interface IZooContract {
         val dataFromDB: LiveData<List<Data>>
         fun getDataManager(): T
         fun observe(event: ZooViewEvent)
-        fun clear()
+        fun stop()
+        fun isStop(): Boolean
     }
 }
 

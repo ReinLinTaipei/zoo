@@ -102,17 +102,19 @@ class BriefListFragment: Fragment(), IZooContract.PageView {
     }
 
     override fun notify(data: Zoo) {
-        Log.i(TAG, "notify $data")
-        brief_swipe.isRefreshing = false
-        when(data) {
-            is Zoo.NoData    -> context?.toast(context!!.getString(R.string.no_data))
-            is Zoo.Exception -> context?.toast(data.message)
+        if (presenter.isStop().not()) {
+            Log.i(TAG, "notify $data")
+            brief_swipe.isRefreshing = false
+            when(data) {
+                is Zoo.NoData    -> context?.toast(context!!.getString(R.string.no_data))
+                is Zoo.Exception -> context?.toast(data.message)
+            }
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        presenter.clear()
+        presenter.stop()
         mainListener = null
     }
 }

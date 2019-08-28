@@ -2,7 +2,6 @@ package com.reinlin.zoo.detail
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -105,11 +104,13 @@ class DetailListFragment : Fragment(), IZooContract.PageView {
     }
 
     override fun notify(data: Zoo) {
-        detail_swipe.isRefreshing = false
-        when (data) {
-            is Zoo.NoData -> context?.toast(getString(R.string.no_data))
-            is Zoo.Exception -> {
-                context?.toast(data.message)
+        if (presenter.isStop().not()) {
+            detail_swipe.isRefreshing = false
+            when (data) {
+                is Zoo.NoData -> context?.toast(getString(R.string.no_data))
+                is Zoo.Exception -> {
+                    context?.toast(data.message)
+                }
             }
         }
     }
@@ -130,7 +131,7 @@ class DetailListFragment : Fragment(), IZooContract.PageView {
 
     override fun onDestroy() {
         super.onDestroy()
-        presenter.clear()
+        presenter.stop()
         mainListener = null
     }
 }

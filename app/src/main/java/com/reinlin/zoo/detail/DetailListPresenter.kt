@@ -40,7 +40,9 @@ class DetailListPresenter(
     override val coroutineContext: CoroutineContext
         get() = dispatcher.contextUI + job
 
-    override fun clear() = job.cancel()
+    override fun stop() = job.cancel()
+
+    override fun isStop(): Boolean = job.isCancelled
 
     override fun getDataManager(): DetailListManager = dataManager
 

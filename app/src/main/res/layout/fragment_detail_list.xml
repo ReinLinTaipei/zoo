@@ -5,13 +5,14 @@
         android:layout_height="match_parent"
         android:id="@+id/detail_swipe"
         android:clickable="true"
-        android:focusable="true"
-    >
+        android:focusable="true">
+
     <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/detail_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingTop="?actionBarSize"
             android:clipToPadding="false"
+            android:fitsSystemWindows="true"
+            android:background="@android:color/white"
             />
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
