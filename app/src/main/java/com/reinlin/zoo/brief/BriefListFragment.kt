@@ -78,7 +78,6 @@ class BriefListFragment: Fragment(), IZooContract.PageView {
         }
 
         brief_swipe.setOnRefreshListener {
-            Log.i(TAG, "delete all")
             event.value = ZooViewEvent.RefreshExhibit
         }
     }
@@ -96,14 +95,12 @@ class BriefListFragment: Fragment(), IZooContract.PageView {
     }
 
     private fun fetchData(offset: Int) {
-        Log.i(TAG, "fetchData: $offset")
         brief_swipe.isRefreshing = true
         event.value = ZooViewEvent.FetchExhibits(offset)
     }
 
     override fun notify(data: Zoo) {
         if (presenter.isStop().not()) {
-            Log.i(TAG, "notify $data")
             brief_swipe.isRefreshing = false
             when(data) {
                 is Zoo.NoData    -> context?.toast(context!!.getString(R.string.no_data))

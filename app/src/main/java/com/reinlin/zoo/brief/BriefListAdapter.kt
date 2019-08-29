@@ -75,7 +75,7 @@ class BriefListAdapter(
                     Glide.with(itemView)
                         .load(url)
                         .centerCrop()
-                        .placeholder(android.R.drawable.ic_dialog_info)
+                        .placeholder(R.drawable.ic_no_image)
                         .into(avatar)
                 }
                 it.name?.let { name -> titleTextView.text = itemView.context.getString(R.string.brief_title, it.id.toString(), name) }

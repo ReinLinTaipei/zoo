@@ -55,7 +55,7 @@ class DetailListAdapter(
                 Glide.with(itemView.context)
                     .load(it)
                     .centerCrop()
-                    .placeholder(android.R.drawable.ic_dialog_info)
+                    .placeholder(R.drawable.ic_no_image)
                     .into(avatar)
             }
 
@@ -75,7 +75,7 @@ class DetailListAdapter(
                 Glide.with(itemView.context)
                     .load(it)
                     .centerCrop()
-                    .placeholder(android.R.drawable.ic_dialog_info)
+                    .placeholder(R.drawable.ic_no_image)
                     .into(avatar)
             }
 
