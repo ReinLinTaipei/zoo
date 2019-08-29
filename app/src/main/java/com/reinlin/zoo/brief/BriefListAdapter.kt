@@ -1,6 +1,5 @@
 package com.reinlin.zoo.brief
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -11,7 +10,6 @@ import com.reinlin.domain.model.Data
 import com.reinlin.zoo.IZooContract
 import com.reinlin.zoo.R
 import com.reinlin.zoo.common.BRIEF_INFO_LENGTH
-import com.reinlin.zoo.common.TAG
 
 class BriefListAdapter(
     private val dataManager: BriefListManager,

@@ -35,6 +35,7 @@ class BriefListPresenter(
 
     override fun stop() {
         job.cancel()
+        cancel()
     }
 
     override fun isStop(): Boolean = job.isCancelled
